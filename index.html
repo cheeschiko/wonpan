@@ -446,21 +446,21 @@ function sibsinOf(dayElem, elem) { return (elem - dayElem + 5) % 5; } // 0비겁
 
 /* ---------- 4. MBTI 인지기능 데이터 ---------- */
 const FUNCS = {
-  Ni: { name: "내향 직관", noun: "설계자", os: "흩어진 조각들이 하나의 그림으로 수렴하는 걸 기다리는 OS. '결국 이렇게 될 것 같다'는 감이 먼저 도착합니다.",
+  Ni: { name: "내향 직관", nick: "미래 예감 안테나", noun: "설계자", os: "흩어진 조각들이 하나의 그림으로 수렴하는 걸 기다리는 OS. '결국 이렇게 될 것 같다'는 감이 먼저 도착합니다.",
         grip: "평소답지 않게 눈앞의 자극에 몰두합니다", sig: ["갑자기 폭식·폭풍쇼핑·밤샘 게임 등 감각 폭주", "사소한 물리적 디테일(소음·촉감)에 예민 폭발"] },
-  Ne: { name: "외향 직관", noun: "발명가", os: "하나의 점에서 가능성이 사방으로 뻗는 OS. '이거 그럼 이렇게도 되겠는데?'가 숨 쉬듯 나옵니다.",
+  Ne: { name: "외향 직관", nick: "아이디어 팝콘 기계", noun: "발명가", os: "하나의 점에서 가능성이 사방으로 뻗는 OS. '이거 그럼 이렇게도 되겠는데?'가 숨 쉬듯 나옵니다.",
         grip: "평소답지 않게 사소한 것에 얽매입니다", sig: ["몸의 작은 신호로 최악의 시나리오를 상상", "과거의 사소한 실수를 무한 재생"] },
-  Si: { name: "내향 감각", noun: "기록보관자", os: "겪은 것을 고해상도로 저장하고 대조하는 OS. '지난번엔 이랬는데'가 판단의 든든한 밑절미입니다.",
+  Si: { name: "내향 감각", nick: "고화질 추억 앨범", noun: "기록보관자", os: "겪은 것을 고해상도로 저장하고 대조하는 OS. '지난번엔 이랬는데'가 판단의 든든한 밑절미입니다.",
         grip: "평소답지 않게 불길한 상상이 뻗어나갑니다", sig: ["갑자기 모든 게 잘못될 것 같은 파국 시나리오", "안 하던 충동적 일탈을 저지르고 후회"] },
-  Se: { name: "외향 감각", noun: "해결사", os: "지금-여기의 변화를 실시간으로 읽는 OS. 몸이 먼저 반응하고 설명은 나중에 붙습니다.",
+  Se: { name: "외향 감각", nick: "지금 이 순간 레이더", noun: "해결사", os: "지금-여기의 변화를 실시간으로 읽는 OS. 몸이 먼저 반응하고 설명은 나중에 붙습니다.",
         grip: "평소답지 않게 의미 없는 미래를 곱씹습니다", sig: ["'이게 다 무슨 소용이지' 급 허무 모드", "근거 없는 불길한 예감에 사로잡힘"] },
-  Ti: { name: "내향 사고", noun: "해석가", os: "무엇이든 분해해서 내부 논리가 맞는지 검증하는 OS. 납득이 안 되면 한 발짝도 안 움직입니다.",
+  Ti: { name: "내향 사고", nick: "논리 현미경", noun: "해석가", os: "무엇이든 분해해서 내부 논리가 맞는지 검증하는 OS. 납득이 안 되면 한 발짝도 안 움직입니다.",
         grip: "평소답지 않게 감정이 물밀듯 터집니다", sig: ["'아무도 날 안 좋아해' 급 감정 소용돌이", "갑자기 서운함을 폭발적으로 표출"] },
-  Te: { name: "외향 사고", noun: "지휘자", os: "목표-경로-마감을 즉시 구조화하는 OS. 일이 생기면 머릿속에 자동으로 간트차트가 그려집니다.",
+  Te: { name: "외향 사고", nick: "착착 계획 엔진", noun: "지휘자", os: "목표-경로-마감을 즉시 구조화하는 OS. 일이 생기면 머릿속에 자동으로 간트차트가 그려집니다.",
         grip: "평소답지 않게 감정의 늪에 빠집니다", sig: ["'내가 뭘 위해 이렇게까지' 급 현타", "평소 안 그러던 사람이 눈물 버튼 고장"] },
-  Fi: { name: "내향 감정", noun: "등불지기", os: "내 가치의 등불에 비추어 진짜와 가짜를 가리는 OS. 어긋나는 일은 이득이어도 몸이 거부합니다.",
+  Fi: { name: "내향 감정", nick: "내 마음의 나침반", noun: "등불지기", os: "내 가치의 등불에 비추어 진짜와 가짜를 가리는 OS. 어긋나는 일은 이득이어도 몸이 거부합니다.",
         grip: "평소답지 않게 효율 기계가 됩니다", sig: ["갑자기 엑셀 켜고 인생 계획표 작성", "주변 사람들의 비효율을 냉정하게 지적"] },
-  Fe: { name: "외향 감정", noun: "온도지기", os: "공간의 감정 온도를 자동 스캔하고 조율하는 OS. 모두가 편안해야 비로소 내가 편안해집니다.",
+  Fe: { name: "외향 감정", nick: "분위기 온도계", noun: "온도지기", os: "공간의 감정 온도를 자동 스캔하고 조율하는 OS. 모두가 편안해야 비로소 내가 편안해집니다.",
         grip: "평소답지 않게 차가운 논리 칼을 꺼냅니다", sig: ["'그래서 팩트가 뭔데' 모드 발동", "혼자 틀어박혀 모든 관계를 재검토"] }
 };
 const STACKS = {
@@ -660,18 +660,19 @@ const Engine = {
   gapCopy(r) {
     const dom = SIBSIN[r.top2[0]];
     const f = FUNCS[r.stack[0]];
-    if (r.band === 0) return `타고난 ${dom.name}의 기운과 ${f.name}(${r.stack[0]}) 선호가 같은 방향을 봅니다. ${BANDS[0].copy}`;
-    if (r.band === 1) return `원판의 중심은 ${dom.name}(${dom.desc})인데, 살아남은 당신은 ${f.name}(${r.stack[0]}) 쪽을 앞세우는 법을 배웠어요. ${BANDS[1].copy}`;
-    return `원판의 중심은 ${dom.name}(${dom.desc})이지만, 지금의 당신은 ${f.name}(${r.stack[0]})${josa(f.name, "으로/로").slice(f.name.length)} 세상을 만나고 있어요. ${BANDS[2].copy}`;
+    if (r.band === 0) return `타고난 ${dom.name}의 기운과 '${f.nick}'(${f.name}·${r.stack[0]}) 선호가 같은 방향을 봅니다. ${BANDS[0].copy}`;
+    if (r.band === 1) return `원판의 중심은 ${dom.name}(${dom.desc})인데, 살아남은 당신은 '${f.nick}'(${f.name}·${r.stack[0]}) 쪽을 앞세우는 법을 배웠어요. ${BANDS[1].copy}`;
+    return `원판의 중심은 ${dom.name}(${dom.desc})이지만, 지금의 당신은 '${f.nick}'(${f.name}·${r.stack[0]})${josa(f.nick, "으로/로").slice(f.nick.length)} 세상을 만나고 있어요. ${BANDS[2].copy}`;
   },
   vsRows(r) {
     const dom = SIBSIN[r.top2[0]];
     const ei = r.input.mbti[0];
     const judging = r.stack.find(f2 => "TeTiFeFi".includes(f2));
+    const domF = FUNCS[r.stack[0]], infF = FUNCS[r.stack[3]];
     return [
-      { axis: "에너지", saju: dom.energy, mbti: ei === "E" ? `바깥 세계와 접속할 때 충전됩니다 (주기능 ${r.stack[0]}가 밖을 향함)` : `안의 세계로 돌아올 때 충전됩니다 (주기능 ${r.stack[0]}가 안을 향함)` },
-      { axis: "결정", saju: STEMS[r.dayStem].decide, mbti: `${FUNCS[judging].name}(${judging})의 문법 — ${FUNCS[judging].os.split(".")[0]}.` },
-      { axis: "스트레스", saju: ELEM_STRESS[r.dayElem], mbti: `열등기능 ${r.stack[3]} 발동 — ${FUNCS[r.stack[3]].grip}` }
+      { axis: "에너지", saju: dom.energy, mbti: ei === "E" ? `바깥 세계와 접속할 때 충전됩니다 — 주기능 '${domF.nick}'(${r.stack[0]})${josa(domF.nick, "이/가").slice(domF.nick.length)} 밖을 향해요` : `안의 세계로 돌아올 때 충전됩니다 — 주기능 '${domF.nick}'(${r.stack[0]})${josa(domF.nick, "이/가").slice(domF.nick.length)} 안을 향해요` },
+      { axis: "결정", saju: STEMS[r.dayStem].decide, mbti: `'${FUNCS[judging].nick}'(${FUNCS[judging].name}·${judging})의 문법 — ${FUNCS[judging].os.split(".")[0]}.` },
+      { axis: "스트레스", saju: ELEM_STRESS[r.dayElem], mbti: `숨겨둔 '${infF.nick}'(열등기능 ${r.stack[3]}) 발동 — ${infF.grip}` }
     ];
   },
   today(r) {
@@ -967,7 +968,7 @@ const App = {
         <div class="hidden-mode">
           <div class="hm-char">${CharSVG.render(r.dayStem, null, "I", { size: 84, uid: "hm", style: "filter:saturate(.4) brightness(.75)" })}</div>
           <div class="hm-body">
-            <p>배터리가 바닥나면, ${stem.obj} 안에 잠들어 있던 <b>${FUNCS[infFunc].name}(${infFunc})</b> 그림자가 깨어납니다. ${FUNCS[infFunc].grip}.</p>
+            <p>배터리가 바닥나면, ${stem.obj} 안에 잠들어 있던 <b>'${FUNCS[infFunc].nick}'</b>(${FUNCS[infFunc].name}·${infFunc}) 그림자가 깨어납니다. ${FUNCS[infFunc].grip}.</p>
             <div class="hm-sig">${FUNCS[infFunc].sig.map(s => `<span>⚡ ${s}</span>`).join("")}</div>
           </div>
         </div>
@@ -999,10 +1000,10 @@ const App = {
           <div class="deep-block">
             <h4>${r.input.mbti}의 인지기능 스택</h4>
             <ul>
-              <li><b>주기능 ${r.stack[0]}</b> (${FUNCS[r.stack[0]].name}) — ${FUNCS[r.stack[0]].os}</li>
-              <li><b>부기능 ${r.stack[1]}</b> (${FUNCS[r.stack[1]].name}) — 두 번째 무기</li>
-              <li><b>3차기능 ${r.stack[2]}</b> (${FUNCS[r.stack[2]].name}) — 놀 때 나오는 나</li>
-              <li><b>열등기능 ${r.stack[3]}</b> (${FUNCS[r.stack[3]].name}) — 스트레스 때 튀어나오는 그림자</li>
+              <li><b>주기능 '${FUNCS[r.stack[0]].nick}'</b> (${FUNCS[r.stack[0]].name}·${r.stack[0]}) — ${FUNCS[r.stack[0]].os}</li>
+              <li><b>부기능 '${FUNCS[r.stack[1]].nick}'</b> (${FUNCS[r.stack[1]].name}·${r.stack[1]}) — 두 번째 무기</li>
+              <li><b>3차기능 '${FUNCS[r.stack[2]].nick}'</b> (${FUNCS[r.stack[2]].name}·${r.stack[2]}) — 놀 때 나오는 나</li>
+              <li><b>열등기능 '${FUNCS[r.stack[3]].nick}'</b> (${FUNCS[r.stack[3]].name}·${r.stack[3]}) — 스트레스 때 튀어나오는 그림자</li>
             </ul>
           </div>
         </div>
