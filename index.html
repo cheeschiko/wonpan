@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>원판 찾기 — 지금의 성격, 원래 당신 겁니까?</title>
+<meta name="description" content="진짜 만세력으로 계산한 사주팔자(타고난 나)와 인지기능으로 해석한 MBTI(살아남은 나)를 대조해, 당신이 원판을 얼마나 덮어썼는지 알려드립니다.">
+<meta property="og:title" content="원판 찾기">
+<meta property="og:description" content="MBTI는 패치노트, 사주는 원본 코드. 지금의 성격, 원래 당신 겁니까?">
+<style>
+:root{
+  --bg1:#FFF9EC; --bg2:#FFE9F0; --bg3:#EFE6FF;
+  --ink:#4A3B66; --ink-soft:#8A7BA8; --ink-faint:#B3A6CC;
+  --card:#FFFFFF;
+  --accent:#9C7BD8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;
+  background:linear-gradient(165deg,var(--bg1) 0%,var(--bg2) 52%,var(--bg3) 100%);
+  min-height:100vh;min-height:100dvh;
+  color:var(--ink);
+  overflow-x:hidden;
+  letter-spacing:-0.01em;
+}
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.deco{position:absolute;animation:floaty 6s ease-in-out infinite;opacity:.7}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.deco-cloud{width:90px;height:34px;background:#FFFFFF;border-radius:999px;opacity:.55;box-shadow:22px -14px 0 -4px #FFFFFF,-20px -10px 0 -8px #FFFFFF}
+.deco-spark{color:#FFC94A;font-size:14px}
+.deco-heart{color:#FFB5C9;font-size:12px;opacity:.45}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- screen switching ---------- */
+section[data-screen]{display:none;position:relative;z-index:1;max-width:520px;margin:0 auto;padding:28px 20px 48px;min-height:100vh;min-height:100dvh}
+body[data-screen="landing"]  section[data-screen="landing"],
+body[data-screen="input"]    section[data-screen="input"],
+body[data-screen="loading"]  section[data-screen="loading"],
+body[data-screen="result"]   section[data-screen="result"]{display:flex;flex-direction:column;animation:fadein .45s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- landing ---------- */
+.landing-inner{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:18px}
+.logo-badge{font-size:.8rem;letter-spacing:.35em;color:var(--accent);font-weight:700}
+h1.hook{font-size:1.95rem;font-weight:800;line-height:1.35}
+h1.hook em{font-style:normal;background:linear-gradient(90deg,#FF9A5C,#FF6E9C,#9C7BD8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub-copy{font-size:.98rem;color:#7A6B98;line-height:1.7}
+.hero-chars{margin:6px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:inherit;font-weight:700;border-radius:999px;transition:transform .15s ease,box-shadow .15s ease;letter-spacing:-0.01em}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,#FFC97E,#FF9EBB);color:#5C3548;font-size:1.1rem;padding:16px 44px;box-shadow:0 6px 0 #F58FB0,0 14px 24px rgba(255,158,187,.35)}
+.btn-primary:active{transform:translateY(4px);box-shadow:0 2px 0 #F58FB0,0 6px 12px rgba(255,158,187,.3)}
+@media (hover:hover){.btn-primary:hover{transform:translateY(-2px)}}
+.btn-ghost{background:#FFFFFF;color:#7A6B98;font-size:.9rem;padding:11px 22px;border:1.5px solid #EADFF5}
+.landing-foot{text-align:center;font-size:.72rem;color:#B3A6CC;line-height:1.8;margin-top:26px}
+.landing-foot a{color:#9C7BD8}
+
+/* ---------- input ---------- */
+.progress{display:flex;gap:6px;margin-bottom:26px}
+.progress span{flex:1;height:6px;border-radius:3px;background:#F0E6F7}
+.progress span.on{background:linear-gradient(90deg,#FFC97E,#FF9EBB);box-shadow:0 0 8px rgba(255,158,187,.5)}
+.step{display:none;flex-direction:column;gap:20px}
+.step.on{display:flex;animation:fadein .35s ease}
+.q-title{font-size:1.32rem;font-weight:800;line-height:1.45}
+.q-sub{font-size:.85rem;color:#9887B8;line-height:1.6;margin-top:-10px}
+.field label{display:block;font-size:.8rem;color:#7A6B98;margin-bottom:8px;font-weight:600}
+.row{display:flex;gap:10px}
+select,input[type=text]{
+  width:100%;appearance:none;background:#FFFFFF;border:1.5px solid #EADFF5;
+  color:var(--ink);border-radius:14px;padding:14px 16px;font-size:1rem;font-family:inherit;outline:none;
+}
+select:focus,input[type=text]:focus{border-color:#FF9EBB;box-shadow:0 0 0 4px rgba(255,158,187,.18)}
+select option{color:#4A3B66;background:#fff}
+.toggle-row{display:flex;gap:8px}
+.toggle-row button{flex:1;padding:12px;border-radius:12px;border:1.5px solid #EADFF5;background:#FFFFFF;color:#7A6B98;font-family:inherit;font-size:.95rem;font-weight:600;cursor:pointer}
+.toggle-row button.on{background:#FFEDF4;border-color:#FF9EBB;color:#D6537E}
+.leap-row{display:none;align-items:center;gap:8px;font-size:.85rem;color:#7A6B98}
+.leap-row.show{display:flex}
+.leap-row input{width:18px;height:18px;accent-color:#FF9EBB}
+.mbti-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mbti-grid button{padding:13px 0;border-radius:12px;border:1.5px solid #EADFF5;background:#FFFFFF;color:#7A6B98;font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .12s}
+.mbti-grid button.on{background:#FFEDF4;border-color:#FF9EBB;color:#D6537E;transform:scale(1.04)}
+.mbti-unknown{margin-top:2px;width:100%;padding:13px;border-radius:12px;border:1.5px dashed #D9C8EE;background:transparent;color:#9887B8;font-family:inherit;font-size:.9rem;cursor:pointer}
+.mbti-unknown.on{border-color:#FF9EBB;color:#D6537E;background:#FFEDF4}
+.nav-row{display:flex;gap:10px;margin-top:8px}
+.nav-row .btn{flex:1;padding:15px 0;font-size:1rem}
+.btn-back{background:#FFFFFF;color:#7A6B98;border:1.5px solid #EADFF5}
+.btn-next{background:linear-gradient(135deg,#FFC97E,#FF9EBB);color:#5C3548;box-shadow:0 5px 0 #F58FB0}
+.btn-next:active{transform:translateY(3px);box-shadow:0 2px 0 #F58FB0}
+.btn-next:disabled{opacity:.35;cursor:not-allowed}
+.err{font-size:.82rem;color:#E85C7B;min-height:1.2em}
+
+/* mini test */
+#minitest{position:fixed;inset:0;z-index:50;background:rgba(74,59,102,.35);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
+#minitest.show{display:flex}
+.mt-card{background:#FFFFFF;border:1.5px solid #F5EDFA;border-radius:22px;max-width:440px;width:100%;padding:26px 22px;display:flex;flex-direction:column;gap:18px;box-shadow:0 18px 44px rgba(140,100,170,.25)}
+.mt-q{font-size:1.05rem;font-weight:700;line-height:1.55;min-height:3.4em}
+.mt-progress{font-size:.78rem;color:#9887B8}
+.mt-btns{display:flex;flex-direction:column;gap:8px}
+.mt-btns button{padding:13px;border-radius:12px;border:1.5px solid #EADFF5;background:#FFFFFF;color:#7A6B98;font-family:inherit;font-size:.95rem;font-weight:600;cursor:pointer}
+.mt-btns button:hover{border-color:#FF9EBB;background:#FFF6F9}
+
+/* ---------- loading ---------- */
+.loading-inner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center}
+.orb{width:86px;height:86px;border-radius:50%;background:conic-gradient(from 0deg,#FFC97E,#FF9EBB,#B49CF0,#9EDCFF,#FFC97E);animation:spin 2.2s linear infinite;filter:blur(1px);position:relative}
+.orb::after{content:"";position:absolute;inset:10px;border-radius:50%;background:var(--bg1)}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loadmsg{font-size:1.02rem;color:#7A6B98;font-weight:600;min-height:1.5em}
+
+/* ---------- result ---------- */
+.result-wrap{display:flex;flex-direction:column;gap:18px}
+.friend-banner{background:#FFF4E0;border:1.5px solid #FFDCA3;border-radius:14px;padding:12px 16px;font-size:.88rem;color:#A87F3E;line-height:1.6}
+.card{background:var(--card);color:var(--ink);border-radius:28px;padding:22px 20px;box-shadow:0 10px 28px rgba(180,140,200,.18);border:1.5px solid #F5EDFA}
+.capture-card{padding:0;overflow:hidden}
+.cc-inner{padding:26px 22px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.cc-top{display:flex;justify-content:space-between;width:100%;font-size:.7rem;color:rgba(43,35,64,.55);font-weight:700;letter-spacing:.12em}
+.cc-charwrap{position:relative;width:200px;height:200px;margin:4px 0}
+.cc-charwrap svg{animation:bounce-soft 2.6s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes bounce-soft{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.965) scaleX(1.02)}}
+.cc-halo{position:absolute;inset:-24px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.85) 0%,rgba(255,255,255,0) 68%)}
+.cc-band{font-size:.72rem;font-weight:800;letter-spacing:.18em;color:rgba(43,35,64,.55)}
+.cc-title{font-size:1.42rem;font-weight:800;letter-spacing:-0.02em}
+.cc-nick{font-size:.85rem;color:rgba(43,35,64,.6);font-weight:600}
+.cc-copy{font-size:.92rem;line-height:1.65;color:rgba(43,35,64,.85);word-break:keep-all}
+.cc-temp{font-size:.8rem;font-weight:800;padding:6px 14px;border-radius:999px;background:rgba(43,35,64,.07)}
+.cc-foot{font-size:.68rem;color:rgba(43,35,64,.45);margin-top:6px;font-weight:600}
+.sec-label{font-size:.75rem;font-weight:800;letter-spacing:.22em;color:#9887B8;margin-bottom:10px}
+.card h3{font-size:1.05rem;font-weight:800;margin-bottom:12px;letter-spacing:-0.01em}
+.gap-stage{display:flex;align-items:flex-end;justify-content:center;gap:0;height:120px;position:relative;margin:8px 0 2px}
+.gap-stage svg{display:block}
+.gap-caption{text-align:center;font-size:.9rem;line-height:1.65;color:rgba(43,35,64,.85);word-break:keep-all}
+.gap-gauge{height:10px;border-radius:5px;background:linear-gradient(90deg,#A8E6CF,#FFD9A8,#FFB5A7);position:relative;margin:14px 6px 6px}
+.gap-pin{position:absolute;top:-5px;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #FF9EBB;transform:translateX(-50%);box-shadow:0 2px 6px rgba(214,83,126,.3)}
+.gap-scale{display:flex;justify-content:space-between;font-size:.68rem;color:rgba(43,35,64,.5);margin:0 2px;font-weight:600}
+.vs-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.vs-table th{font-size:.78rem;padding:8px 6px;font-weight:800}
+.vs-table th.saju{color:#3E8E6E}.vs-table th.mbti{color:#7A5FB8}
+.vs-table td{font-size:.83rem;line-height:1.55;padding:9px 8px;vertical-align:top;word-break:keep-all}
+.vs-table tr+tr td{border-top:1px dashed rgba(43,35,64,.12)}
+.vs-table td.axis{font-size:.7rem;font-weight:800;color:rgba(43,35,64,.45);width:18%;padding-top:11px}
+.hidden-mode{display:flex;gap:14px;align-items:flex-start}
+.hm-char{flex:0 0 84px}
+.hm-body{flex:1}
+.hm-body p{font-size:.88rem;line-height:1.65;word-break:keep-all}
+.hm-sig{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.hm-sig span{font-size:.82rem;background:rgba(43,35,64,.05);border-radius:10px;padding:8px 12px;line-height:1.5}
+.today-card{background:linear-gradient(120deg,#2A2148,#3D2C5C);color:#F3EFFA;border:1px solid rgba(255,255,255,.14)}
+.today-card h3{color:#FFD9A8}
+.today-card p{font-size:.92rem;line-height:1.7;word-break:keep-all}
+details.deep{background:#FFFFFF;border:1.5px solid #F5EDFA;border-radius:22px;overflow:hidden;box-shadow:0 10px 28px rgba(180,140,200,.14)}
+details.deep summary{cursor:pointer;list-style:none;padding:16px 20px;font-weight:700;font-size:.95rem;color:#7A6B98;display:flex;justify-content:space-between;align-items:center}
+details.deep summary::after{content:"▾";transition:transform .2s}
+details.deep[open] summary::after{transform:rotate(180deg)}
+.deep-inner{padding:4px 20px 20px;display:flex;flex-direction:column;gap:16px}
+.deep-block h4{font-size:.85rem;color:#E8A04B;margin-bottom:6px;font-weight:800}
+.deep-block p,.deep-block li{font-size:.85rem;line-height:1.7;color:#6B5C8C;word-break:keep-all}
+.deep-block ul{padding-left:18px}
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:4px 0}
+.pillar{background:#F8F3FC;border-radius:12px;padding:10px 4px;text-align:center}
+.pillar .pl{font-size:.65rem;color:#9887B8;font-weight:700}
+.pillar .pv{font-size:1.05rem;font-weight:800;margin-top:3px;color:#4A3B66}
+.pillar .ph{font-size:.72rem;color:#9887B8;margin-top:1px}
+.elem-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:6px 0 4px}
+.elem-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:.72rem;color:#7A6B98}
+.elem-legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px}
+.share-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.share-grid .btn{padding:14px 0;font-size:.92rem}
+.share-grid .wide{grid-column:1/-1}
+.compat-card .cp-chars{display:flex;justify-content:center;align-items:center;gap:6px;margin:6px 0}
+.compat-card .cp-heart{font-size:1.5rem}
+.compat-card .cp-temp{text-align:center;font-size:1.5rem;font-weight:800;margin:4px 0}
+.compat-card p{font-size:.88rem;line-height:1.65;text-align:center;word-break:keep-all}
+.foot-disclaimer{font-size:.72rem;color:#B3A6CC;line-height:1.9;text-align:center;padding:10px 6px 0}
+.foot-disclaimer b{color:#9887B8}
+#toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:#fff;color:#2B2340;font-size:.85rem;font-weight:700;padding:12px 22px;border-radius:999px;opacity:0;pointer-events:none;transition:all .3s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.35);white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#save-overlay{position:fixed;inset:0;z-index:80;background:rgba(74,59,102,.88);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px}
+#save-overlay.show{display:flex}
+#save-overlay img{max-width:78%;max-height:62vh;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+#save-overlay p{color:#FFF;font-size:.9rem;font-weight:600}
+@media (max-width:380px){h1.hook{font-size:1.7rem}.cc-title{font-size:1.25rem}}
+</style>
+</head>
+<body data-screen="landing">
+<div id="stars"></div>
+
+<!-- ================= LANDING ================= -->
+<section data-screen="landing">
+  <div class="landing-inner">
+    <div class="logo-badge">🪐 원 판 찾 기</div>
+    <h1 class="hook">지금의 성격,<br><em>원래 당신 겁니까?</em></h1>
+    <p class="sub-copy">MBTI는 패치노트, 사주는 원본 코드.<br>진짜 만세력으로 계산한 <b>타고난 나</b>와<br>살아남기 위해 업데이트된 <b>지금의 나</b>를 대조합니다.</p>
+    <div class="hero-chars" id="hero-chars"></div>
+    <button class="btn btn-primary" onclick="App.start()">내 원판 확인하기 ✨</button>
+    <button class="btn btn-ghost" id="btn-lastresult" style="display:none" onclick="App.loadLast()">지난 결과 다시 보기</button>
+  </div>
+  <p class="landing-foot">
+    입력 정보는 서버로 전송되지 않고 이 브라우저에만 저장됩니다.<br>
+    오락·자기이해용 콘텐츠 · 입춘/절기일 기준 만세력 계산<br>
+    inspired by <a href="https://peppy-kulfi-dcb95b.netlify.app/" target="_blank" rel="noopener">운명 패치 🫧</a>
+  </p>
+</section>
+
+<!-- ================= INPUT ================= -->
+<section data-screen="input">
+  <div class="progress"><span id="pg1"></span><span id="pg2"></span><span id="pg3"></span></div>
+
+  <div class="step" id="step1">
+    <div>
+      <div class="q-title">당신이 세상에 도착한 순간 🌏</div>
+      <p class="q-sub">이 시각으로 사주팔자 원본 코드를 복원합니다.</p>
+    </div>
+    <div class="field">
+      <label>양력 / 음력</label>
+      <div class="toggle-row">
+        <button id="cal-sol" class="on" onclick="App.setCal('sol')">양력</button>
+        <button id="cal-lun" onclick="App.setCal('lun')">음력</button>
+      </div>
+      <div class="leap-row" id="leap-row" style="margin-top:10px">
+        <input type="checkbox" id="leap-chk"><label for="leap-chk" style="margin:0">윤달에 태어났어요</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>생년월일</label>
+      <div class="row">
+        <select id="sel-y"></select>
+        <select id="sel-m"></select>
+        <select id="sel-d"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label>태어난 시간 <span style="color:#8B80A8;font-weight:400">(사주처럼 2시간 단위)</span></label>
+      <select id="sel-h"></select>
+    </div>
+    <p class="err" id="err1"></p>
+    <div class="nav-row">
+      <button class="btn btn-back" onclick="App.go('landing')">처음으로</button>
+      <button class="btn btn-next" onclick="App.next1()">다음</button>
+    </div>
+  </div>
+
+  <div class="step" id="step2">
+    <div>
+      <div class="q-title">살아남은 당신의 이름표 🏷️</div>
+      <p class="q-sub">MBTI는 능력도 운명도 아닌 '선호'의 기록입니다. 편하게 골라주세요.</p>
+    </div>
+    <div class="mbti-grid" id="mbti-grid"></div>
+    <button class="mbti-unknown" id="mbti-unknown" onclick="App.openMiniTest()">🤔 모름 — 30초 간이 추정하기</button>
+    <p class="err" id="err2"></p>
+    <div class="nav-row">
+      <button class="btn btn-back" onclick="App.showStep(1)">이전</button>
+      <button class="btn btn-next" onclick="App.next2()">다음</button>
+    </div>
+  </div>
+
+  <div class="step" id="step3">
+    <div>
+      <div class="q-title">결과 카드에 새길 이름 ✍️</div>
+      <p class="q-sub">닉네임도 좋고, 진짜 이름도 좋아요. (최대 12자)</p>
+    </div>
+    <div class="field">
+      <input type="text" id="inp-nick" maxlength="12" placeholder="예: 성빈" autocomplete="off">
+    </div>
+    <p class="err" id="err3"></p>
+    <div class="nav-row">
+      <button class="btn btn-back" onclick="App.showStep(2)">이전</button>
+      <button class="btn btn-next" onclick="App.submit()">원판 열람하기 🔮</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LOADING ================= -->
+<section data-screen="loading">
+  <div class="loading-inner">
+    <div class="orb"></div>
+    <p id="loadmsg">만세력 펼치는 중…</p>
+  </div>
+</section>
+
+<!-- ================= RESULT ================= -->
+<section data-screen="result">
+  <div class="result-wrap" id="result-wrap"></div>
+</section>
+
+<!-- mini test modal -->
+<div id="minitest">
+  <div class="mt-card">
+    <div class="mt-progress" id="mt-progress">1 / 8</div>
+    <div class="mt-q" id="mt-q"></div>
+    <div class="mt-btns">
+      <button onclick="App.mtAnswer(2)">자주 그렇다</button>
+      <button onclick="App.mtAnswer(1)">가끔 그렇다</button>
+      <button onclick="App.mtAnswer(0)">아니다</button>
+    </div>
+    <button class="btn btn-ghost" onclick="App.closeMiniTest()">닫기</button>
+  </div>
+</div>
+
+<div id="save-overlay" onclick="this.classList.remove('show')">
+  <p>이미지를 길게 눌러 저장하세요 📌</p>
+  <img id="save-img" alt="결과 카드">
+  <p style="font-size:.78rem;color:#A99BD1">화면을 탭하면 닫힙니다</p>
+</div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   원판 찾기 — 사주(타고난 나) × MBTI(살아남은 나)
+   단일 파일 · 외부 의존성 0 · 모든 계산은 브라우저에서만 수행
+   ===================================================================== */
+
+/* ---------- 1. 달력 데이터 (1900–2100) ---------- */
+// 음력 월대소·윤달 비트팩 테이블 (표준 lunarInfo, 1900~2100)
+const LUNAR_INFO=[19416,19168,42352,21717,53856,55632,91476,22176,39632,21970,19168,42422,42192,53840,119381,46400,54944,44450,38320,84343,18800,42160,46261,27216,27968,109396,11104,38256,21234,18800,25958,54432,59984,28309,23248,11104,100067,37600,116951,51536,54432,120998,46416,22176,107956,9680,37584,53938,43344,46423,27808,46416,86869,19872,42416,83315,21168,43432,59728,27296,44710,43856,19296,43748,42352,21088,62051,55632,23383,22176,38608,19925,19152,42192,54484,53840,54616,46400,46752,103846,38320,18864,43380,42160,45690,27216,27968,44870,43872,38256,19189,18800,25776,29859,59984,27480,23232,43872,38613,37600,51552,55636,54432,55888,30034,22176,43959,9680,37584,51893,43344,46240,47780,44368,21977,19360,42416,86390,21168,43312,31060,27296,44368,23378,19296,42726,42208,53856,60005,54576,23200,30371,38608,19195,19152,42192,118966,53840,54560,56645,46496,22224,21938,18864,42359,42160,43600,111189,27936,44448,84835,37744,18936,18800,25776,92326,59984,27424,108228,43744,37600,53987,51552,54615,54432,55888,23893,22176,42704,21972,21200,43448,43344,46240,46758,44368,21920,43940,42416,21168,45683,26928,29495,27296,44368,84821,19296,42352,21732,53600,59752,54560,55968,92838,22224,19168,43476,42192,53584,62034,54560];
+// 24절기 진입일 테이블 (연도별 인코딩, 1900~2100)
+const STERM_INFO="9778397bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf97c3598082c95f8c965cc920f,97bd0b06bdb0722c965ce1cfcc920f,b027097bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf97c359801ec95f8c965cc920f,97bd0b06bdb0722c965ce1cfcc920f,b027097bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf97c359801ec95f8c965cc920f,97bd0b06bdb0722c965ce1cfcc920f,b027097bd097c36b0b6fc9274c91aa,9778397bd19801ec9210c965cc920e,97b6b97bd19801ec95f8c965cc920f,97bd09801d98082c95f8e1cfcc920f,97bd097bd097c36b0b6fc9210c8dc2,9778397bd197c36c9210c9274c91aa,97b6b97bd19801ec95f8c965cc920e,97bd09801d98082c95f8e1cfcc920f,97bd097bd097c36b0b6fc9210c8dc2,9778397bd097c36c9210c9274c91aa,97b6b97bd19801ec95f8c965cc920e,97bcf97c3598082c95f8e1cfcc920f,97bd097bd097c36b0b6fc9210c8dc2,9778397bd097c36c9210c9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf97c3598082c95f8c965cc920f,97bd097bd097c35b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf97c3598082c95f8c965cc920f,97bd097bd097c35b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf97c359801ec95f8c965cc920f,97bd097bd097c35b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf97c359801ec95f8c965cc920f,97bd097bd097c35b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf97c359801ec95f8c965cc920f,97bd097bd07f595b0b6fc920fb0722,9778397bd097c36b0b6fc9210c8dc2,9778397bd19801ec9210c9274c920e,97b6b97bd19801ec95f8c965cc920f,97bd07f5307f595b0b0bc920fb0722,7f0e397bd097c36b0b6fc9210c8dc2,9778397bd097c36c9210c9274c920e,97b6b97bd19801ec95f8c965cc920f,97bd07f5307f595b0b0bc920fb0722,7f0e397bd097c36b0b6fc9210c8dc2,9778397bd097c36c9210c9274c91aa,97b6b97bd19801ec9210c965cc920e,97bd07f1487f595b0b0bc920fb0722,7f0e397bd097c36b0b6fc9210c8dc2,9778397bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf7f1487f595b0b0bb0b6fb0722,7f0e397bd097c35b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf7f1487f595b0b0bb0b6fb0722,7f0e397bd097c35b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf7f1487f531b0b0bb0b6fb0722,7f0e397bd097c35b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c965cc920e,97bcf7f1487f531b0b0bb0b6fb0722,7f0e397bd07f595b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b97bd19801ec9210c9274c920e,97bcf7f0e47f531b0b0bb0b6fb0722,7f0e397bd07f595b0b0bc920fb0722,9778397bd097c36b0b6fc9210c91aa,97b6b97bd197c36c9210c9274c920e,97bcf7f0e47f531b0b0bb0b6fb0722,7f0e397bd07f595b0b0bc920fb0722,9778397bd097c36b0b6fc9210c8dc2,9778397bd097c36c9210c9274c920e,97b6b7f0e47f531b0723b0b6fb0722,7f0e37f5307f595b0b0bc920fb0722,7f0e397bd097c36b0b6fc9210c8dc2,9778397bd097c36b0b70c9274c91aa,97b6b7f0e47f531b0723b0b6fb0721,7f0e37f1487f595b0b0bb0b6fb0722,7f0e397bd097c35b0b6fc9210c8dc2,9778397bd097c36b0b6fc9274c91aa,97b6b7f0e47f531b0723b0b6fb0721,7f0e27f1487f595b0b0bb0b6fb0722,7f0e397bd097c35b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b7f0e47f531b0723b0b6fb0721,7f0e27f1487f531b0b0bb0b6fb0722,7f0e397bd097c35b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b7f0e47f531b0723b0b6fb0721,7f0e27f1487f531b0b0bb0b6fb0722,7f0e397bd097c35b0b6fc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b7f0e47f531b0723b0b6fb0721,7f0e27f1487f531b0b0bb0b6fb0722,7f0e397bd07f595b0b0bc920fb0722,9778397bd097c36b0b6fc9274c91aa,97b6b7f0e47f531b0723b0787b0721,7f0e27f0e47f531b0b0bb0b6fb0722,7f0e397bd07f595b0b0bc920fb0722,9778397bd097c36b0b6fc9210c91aa,97b6b7f0e47f149b0723b0787b0721,7f0e27f0e47f531b0723b0b6fb0722,7f0e397bd07f595b0b0bc920fb0722,9778397bd097c36b0b6fc9210c8dc2,977837f0e37f149b0723b0787b0721,7f07e7f0e47f531b0723b0b6fb0722,7f0e37f5307f595b0b0bc920fb0722,7f0e397bd097c35b0b6fc9210c8dc2,977837f0e37f14998082b0787b0721,7f07e7f0e47f531b0723b0b6fb0721,7f0e37f1487f595b0b0bb0b6fb0722,7f0e397bd097c35b0b6fc9210c8dc2,977837f0e37f14998082b0787b06bd,7f07e7f0e47f531b0723b0b6fb0721,7f0e27f1487f531b0b0bb0b6fb0722,7f0e397bd097c35b0b6fc920fb0722,977837f0e37f14998082b0787b06bd,7f07e7f0e47f531b0723b0b6fb0721,7f0e27f1487f531b0b0bb0b6fb0722,7f0e397bd097c35b0b6fc920fb0722,977837f0e37f14998082b0787b06bd,7f07e7f0e47f531b0723b0b6fb0721,7f0e27f1487f531b0b0bb0b6fb0722,7f0e397bd07f595b0b0bc920fb0722,977837f0e37f14998082b0787b06bd,7f07e7f0e47f531b0723b0b6fb0721,7f0e27f1487f531b0b0bb0b6fb0722,7f0e397bd07f595b0b0bc920fb0722,977837f0e37f14998082b0787b06bd,7f07e7f0e47f149b0723b0787b0721,7f0e27f0e47f531b0b0bb0b6fb0722,7f0e397bd07f595b0b0bc920fb0722,977837f0e37f14998082b0723b06bd,7f07e7f0e37f149b0723b0787b0721,7f0e27f0e47f531b0723b0b6fb0722,7f0e397bd07f595b0b0bc920fb0722,977837f0e37f14898082b0723b02d5,7ec967f0e37f14998082b0787b0721,7f07e7f0e47f531b0723b0b6fb0722,7f0e37f1487f595b0b0bb0b6fb0722,7f0e37f0e37f14898082b0723b02d5,7ec967f0e37f14998082b0787b0721,7f07e7f0e47f531b0723b0b6fb0722,7f0e37f1487f531b0b0bb0b6fb0722,7f0e37f0e37f14898082b0723b02d5,7ec967f0e37f14998082b0787b06bd,7f07e7f0e47f531b0723b0b6fb0721,7f0e37f1487f531b0b0bb0b6fb0722,7f0e37f0e37f14898082b072297c35,7ec967f0e37f14998082b0787b06bd,7f07e7f0e47f531b0723b0b6fb0721,7f0e27f1487f531b0b0bb0b6fb0722,7f0e37f0e37f14898082b072297c35,7ec967f0e37f14998082b0787b06bd,7f07e7f0e47f531b0723b0b6fb0721,7f0e27f1487f531b0b0bb0b6fb0722,7f0e37f0e366aa89801eb072297c35,7ec967f0e37f14998082b0787b06bd,7f07e7f0e47f149b0723b0787b0721,7f0e27f1487f531b0b0bb0b6fb0722,7f0e37f0e366aa89801eb072297c35,7ec967f0e37f14998082b0723b06bd,7f07e7f0e47f149b0723b0787b0721,7f0e27f0e47f531b0723b0b6fb0722,7f0e37f0e366aa89801eb072297c35,7ec967f0e37f14998082b0723b06bd,7f07e7f0e37f14998083b0787b0721,7f0e27f0e47f531b0723b0b6fb0722,7f0e37f0e366aa89801eb072297c35,7ec967f0e37f14898082b0723b02d5,7f07e7f0e37f14998082b0787b0721,7f07e7f0e47f531b0723b0b6fb0722,7f0e36665b66aa89801e9808297c35,665f67f0e37f14898082b0723b02d5,7ec967f0e37f14998082b0787b0721,7f07e7f0e47f531b0723b0b6fb0722,7f0e36665b66a449801e9808297c35,665f67f0e37f14898082b0723b02d5,7ec967f0e37f14998082b0787b06bd,7f07e7f0e47f531b0723b0b6fb0721,7f0e36665b66a449801e9808297c35,665f67f0e37f14898082b072297c35,7ec967f0e37f14998082b0787b06bd,7f07e7f0e47f531b0723b0b6fb0721,7f0e26665b66a449801e9808297c35,665f67f0e37f1489801eb072297c35,7ec967f0e37f14998082b0787b06bd,7f07e7f0e47f531b0723b0b6fb0721,7f0e27f1487f531b0b0bb0b6fb0722".split(",");
+
+/* ---------- 2. 만세력 계산 엔진 (정수 연산) ---------- */
+const Calc = {
+  // 율리우스일 (그레고리력)
+  jdn(y, m, d) {
+    const a = Math.floor((14 - m) / 12), y2 = y + 4800 - a, m2 = m + 12 * a - 3;
+    return d + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045;
+  },
+  jdnToDate(jdn) {
+    let a = jdn + 32044, b = Math.floor((4 * a + 3) / 146097), c = a - Math.floor(146097 * b / 4);
+    let d2 = Math.floor((4 * c + 3) / 1461), e = c - Math.floor(1461 * d2 / 4), m2 = Math.floor((5 * e + 2) / 153);
+    return { d: e - Math.floor((153 * m2 + 2) / 5) + 1, m: m2 + 3 - 12 * Math.floor(m2 / 10), y: 100 * b + d2 - 4800 + Math.floor(m2 / 10) };
+  },
+  // n번째 절기(1=소한 … 24=대설 뒤 동지 아님, 1소한 2대한 3입춘 4우수 …)의 해당 연도 진입 '일(day)'
+  term(y, n) {
+    const t = STERM_INFO[y - 1900];
+    const info = [];
+    for (let i = 0; i < 6; i++) info.push(String(parseInt(t.substr(i * 5, 5), 16)).padStart(6, "0"));
+    const cal = [];
+    for (const x of info) cal.push(+x.substr(0, 1), +x.substr(1, 2), +x.substr(3, 1), +x.substr(4, 2));
+    return cal[n - 1];
+  },
+  // 음력 유틸
+  lLeapMonth(y) { return LUNAR_INFO[y - 1900] & 0xf; },
+  lLeapDays(y) { return this.lLeapMonth(y) ? ((LUNAR_INFO[y - 1900] & 0x10000) ? 30 : 29) : 0; },
+  lMonthDays(y, m) { return (LUNAR_INFO[y - 1900] & (0x10000 >> m)) ? 30 : 29; },
+  lYearDays(y) {
+    let s = 348;
+    for (let i = 0x8000; i > 0x8; i >>= 1) if (LUNAR_INFO[y - 1900] & i) s++;
+    return s + this.lLeapDays(y);
+  },
+  // 음력 → 양력 (기준: 음력 1900.1.1 = 양력 1900.1.31)
+  lunarToSolar(ly, lm, ld, isLeap) {
+    if (ly < 1900 || ly > 2100) return null;
+    const lp = this.lLeapMonth(ly);
+    if (isLeap && lm !== lp) return null;
+    const maxD = isLeap ? this.lLeapDays(ly) : this.lMonthDays(ly, lm);
+    if (ld < 1 || ld > maxD) return null;
+    let offset = 0;
+    for (let y = 1900; y < ly; y++) offset += this.lYearDays(y);
+    for (let m = 1; m < lm; m++) offset += this.lMonthDays(ly, m);
+    if (lp && (lm > lp || isLeap)) offset += this.lLeapDays(ly);
+    offset += ld - 1;
+    return this.jdnToDate(this.jdn(1900, 1, 31) + offset);
+  },
+  // 사주팔자: 년/월/일/시 4주 (hourIdx: 0=자시…11=해시, -1=모름)
+  saju(y, m, d, hourIdx) {
+    // 일주: (JDN+49)%60, 앵커 1900-01-01=갑술(10)·2000-01-01=무오(54) 검증됨
+    const dayIdx = ((this.jdn(y, m, d) + 49) % 60 + 60) % 60;
+    // 년주: 입춘(3번째 절기)일 기준
+    const ipchun = this.term(y, 3);
+    const adjY = (m < 2 || (m === 2 && d < ipchun)) ? y - 1 : y;
+    const yearIdx = ((adjY - 4) % 60 + 60) % 60;
+    // 월주: 각 달의 節 (홀수 절기 2m-1) 진입일 기준
+    let jieM = (d >= this.term(y, 2 * m - 1)) ? m : m - 1;
+    if (jieM === 0) jieM = 12; // 1월 초 소한 이전 → 전년 12월 절기월(자월)
+    const monthIdx = (jieM - 2 + 12) % 12;           // 0=인월 … 11=축월
+    const yStem = yearIdx % 10;
+    const mStem = ((yStem % 5) * 2 + 2 + monthIdx) % 10;   // 오호둔
+    const mBranch = (monthIdx + 2) % 12;
+    // 시주: 오서둔 (23시는 당일 자시로 처리)
+    let hour = null;
+    if (hourIdx >= 0) hour = { stem: ((dayIdx % 10 % 5) * 2 + hourIdx) % 10, branch: hourIdx };
+    return {
+      year: { stem: yStem, branch: yearIdx % 12 },
+      month: { stem: mStem, branch: mBranch },
+      day: { stem: dayIdx % 10, branch: dayIdx % 12 },
+      hour
+    };
+  }
+};
+
+/* ---------- 3. 명리 해석 데이터 ---------- */
+const STEM_NAMES = ["갑", "을", "병", "정", "무", "기", "경", "신", "임", "계"];
+const STEM_HANJA = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+const BRANCH_NAMES = ["자", "축", "인", "묘", "진", "사", "오", "미", "신", "유", "술", "해"];
+const BRANCH_HANJA = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+const STEM_ELEM = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4];          // 목목화화토토금금수수
+const BRANCH_ELEM = [4, 2, 0, 0, 2, 1, 1, 2, 3, 3, 2, 4];  // 자축인묘진사오미신유술해
+const ELEMS = [
+  { k: "목", name: "나무", main: "#93EDBF", sub: "#4FD695", bg1: "#EFFCF3", bg2: "#D9F7E4", dark: "#3E8E6E" },
+  { k: "화", name: "불꽃", main: "#FFAD9C", sub: "#FF7E66", bg1: "#FFF2ED", bg2: "#FFDFD3", dark: "#C75B4A" },
+  { k: "토", name: "대지", main: "#FFDF9E", sub: "#F2B95C", bg1: "#FFF8E8", bg2: "#FBEBC7", dark: "#A87F3E" },
+  { k: "금", name: "금속", main: "#EBE5FA", sub: "#B49CF0", bg1: "#F8F5FE", bg2: "#EAE1FA", dark: "#7A6FA8" },
+  { k: "수", name: "물", main: "#9EDCFF", sub: "#5CBAF5", bg1: "#EEF9FF", bg2: "#D6EFFF", dark: "#3E7A9E" }
+];
+// 10천간 = 캐릭터 베이스 10종
+const STEMS = [
+  { name: "갑목", obj: "곧은 나무", mod: "숲을 여는", kw: "추진 · 원칙", decide: "옳다고 믿는 방향이 정해지면 좌고우면 없이 밀고 나가는 결정",
+    desc: "위로 쭉 뻗는 큰 나무의 결. 시작하는 힘과 곧은 원칙이 기본값입니다." },
+  { name: "을목", obj: "덩굴", mod: "담쟁이의", kw: "유연 · 생존력", decide: "정면돌파 대신 틈을 찾아 감아 올라가는 유연한 결정",
+    desc: "바위도 감아 오르는 덩굴의 결. 부드럽지만 결국 자기 자리를 만들어냅니다." },
+  { name: "병화", obj: "태양", mod: "한낮의", kw: "발산 · 낙천", decide: "일단 밝은 쪽을 보고 크게 지르는 결정",
+    desc: "가리지 않고 두루 비추는 태양의 결. 존재만으로 판이 환해집니다." },
+  { name: "정화", obj: "촛불", mod: "촛불의", kw: "온기 · 집중", decide: "내 사람, 내 일에만 조용히 화력을 모으는 결정",
+    desc: "어둠 속에서 더 또렷해지는 촛불의 결. 좁고 깊게, 그러나 오래 타오릅니다." },
+  { name: "무토", obj: "산", mod: "산맥의", kw: "묵직 · 신뢰", decide: "쉽게 움직이지 않다가, 움직이면 산이 통째로 이동하는 결정",
+    desc: "무슨 일이 있어도 그 자리에 있는 산의 결. 사람들이 기대는 기본 지형입니다." },
+  { name: "기토", obj: "밭", mod: "들녘의", kw: "포용 · 실속", decide: "일단 다 받아두고, 실속 있는 것만 조용히 남기는 결정",
+    desc: "무엇이든 심으면 자라게 하는 밭의 결. 품이 넓고 계산은 정확합니다." },
+  { name: "경금", obj: "무쇠", mod: "무쇠의", kw: "결단 · 직진", decide: "복잡한 매듭은 풀지 않고 한 번에 잘라버리는 결정",
+    desc: "두드릴수록 단단해지는 무쇠의 결. 맺고 끊음이 삶의 문법입니다." },
+  { name: "신금", obj: "보석", mod: "보석함의", kw: "예리 · 완벽", decide: "디테일이 마음에 들 때까지 세공을 멈추지 않는 결정",
+    desc: "이미 정제된 보석의 결. 예리하고, 스스로에게 가장 엄격합니다." },
+  { name: "임수", obj: "바다", mod: "심해의", kw: "스케일 · 자유", decide: "작은 규칙보다 큰 흐름을 보고 던지는 결정",
+    desc: "무엇이든 삼키고 어디로든 흐르는 바다의 결. 그릇의 크기를 재기 어렵습니다." },
+  { name: "계수", obj: "이슬비", mod: "이슬비의", kw: "감수성 · 침투", decide: "티 안 나게 스며들어 어느새 판을 적셔버리는 결정",
+    desc: "소리 없이 만물을 적시는 이슬비의 결. 여리게 보여도 가장 깊이 스며듭니다." }
+];
+const ELEM_STRESS = [
+  "스트레스가 쌓이면 '더 해내야 한다'며 자신을 몰아붙이는 쪽으로 기웁니다 (목의 과성장)",
+  "스트레스가 쌓이면 확 타올랐다가 재처럼 급식는 사이클을 탑니다 (화의 점멸)",
+  "스트레스가 쌓이면 입을 닫고 그 자리에 굳어버립니다 (토의 침묵)",
+  "스트레스가 쌓이면 날이 서서 자신과 남을 함께 벼립니다 (금의 예각)",
+  "스트레스가 쌓이면 깊이 가라앉아 생각의 바닥까지 내려갑니다 (수의 침잠)"
+];
+
+// 십신 5그룹
+const SIBSIN = [
+  { k: "비겁", name: "자기 축", desc: "내 기준으로 서 있는 힘", energy: "밖의 평가보다 내 축을 지키는 데 에너지를 씁니다" },
+  { k: "식상", name: "표현", desc: "안의 것을 밖으로 꺼내는 힘", energy: "느끼고 만든 것을 밖으로 꺼내는 데 에너지를 씁니다" },
+  { k: "재성", name: "현실 운용", desc: "손에 잡히는 것을 다루는 힘", energy: "눈앞의 현실과 자원을 굴리는 데 에너지를 씁니다" },
+  { k: "관성", name: "규범", desc: "틀과 책임을 지는 힘", energy: "질서를 세우고 책임을 감당하는 데 에너지를 씁니다" },
+  { k: "인성", name: "수용", desc: "받아들이고 소화하는 힘", energy: "배우고 소화해서 안에 쌓는 데 에너지를 씁니다" }
+];
+// 일간 대비 오행 관계 → 십신 그룹 인덱스
+function sibsinOf(dayElem, elem) { return (elem - dayElem + 5) % 5; } // 0비겁 1식상 2재성 3관성 4인성
+
+/* ---------- 4. MBTI 인지기능 데이터 ---------- */
+const FUNCS = {
+  Ni: { name: "내향 직관", noun: "설계자", os: "흩어진 조각들이 하나의 그림으로 수렴하는 걸 기다리는 OS. '결국 이렇게 될 것 같다'는 감이 먼저 도착합니다.",
+        grip: "평소답지 않게 눈앞의 자극에 몰두합니다", sig: ["갑자기 폭식·폭풍쇼핑·밤샘 게임 등 감각 폭주", "사소한 물리적 디테일(소음·촉감)에 예민 폭발"] },
+  Ne: { name: "외향 직관", noun: "발명가", os: "하나의 점에서 가능성이 사방으로 뻗는 OS. '이거 그럼 이렇게도 되겠는데?'가 숨 쉬듯 나옵니다.",
+        grip: "평소답지 않게 사소한 것에 얽매입니다", sig: ["몸의 작은 신호로 최악의 시나리오를 상상", "과거의 사소한 실수를 무한 재생"] },
+  Si: { name: "내향 감각", noun: "기록보관자", os: "겪은 것을 고해상도로 저장하고 대조하는 OS. '지난번엔 이랬는데'가 판단의 든든한 밑절미입니다.",
+        grip: "평소답지 않게 불길한 상상이 뻗어나갑니다", sig: ["갑자기 모든 게 잘못될 것 같은 파국 시나리오", "안 하던 충동적 일탈을 저지르고 후회"] },
+  Se: { name: "외향 감각", noun: "해결사", os: "지금-여기의 변화를 실시간으로 읽는 OS. 몸이 먼저 반응하고 설명은 나중에 붙습니다.",
+        grip: "평소답지 않게 의미 없는 미래를 곱씹습니다", sig: ["'이게 다 무슨 소용이지' 급 허무 모드", "근거 없는 불길한 예감에 사로잡힘"] },
+  Ti: { name: "내향 사고", noun: "해석가", os: "무엇이든 분해해서 내부 논리가 맞는지 검증하는 OS. 납득이 안 되면 한 발짝도 안 움직입니다.",
+        grip: "평소답지 않게 감정이 물밀듯 터집니다", sig: ["'아무도 날 안 좋아해' 급 감정 소용돌이", "갑자기 서운함을 폭발적으로 표출"] },
+  Te: { name: "외향 사고", noun: "지휘자", os: "목표-경로-마감을 즉시 구조화하는 OS. 일이 생기면 머릿속에 자동으로 간트차트가 그려집니다.",
+        grip: "평소답지 않게 감정의 늪에 빠집니다", sig: ["'내가 뭘 위해 이렇게까지' 급 현타", "평소 안 그러던 사람이 눈물 버튼 고장"] },
+  Fi: { name: "내향 감정", noun: "등불지기", os: "내 가치의 등불에 비추어 진짜와 가짜를 가리는 OS. 어긋나는 일은 이득이어도 몸이 거부합니다.",
+        grip: "평소답지 않게 효율 기계가 됩니다", sig: ["갑자기 엑셀 켜고 인생 계획표 작성", "주변 사람들의 비효율을 냉정하게 지적"] },
+  Fe: { name: "외향 감정", noun: "온도지기", os: "공간의 감정 온도를 자동 스캔하고 조율하는 OS. 모두가 편안해야 비로소 내가 편안해집니다.",
+        grip: "평소답지 않게 차가운 논리 칼을 꺼냅니다", sig: ["'그래서 팩트가 뭔데' 모드 발동", "혼자 틀어박혀 모든 관계를 재검토"] }
+};
+const STACKS = {
+  ISTJ: ["Si", "Te", "Fi", "Ne"], ISFJ: ["Si", "Fe", "Ti", "Ne"], INFJ: ["Ni", "Fe", "Ti", "Se"], INTJ: ["Ni", "Te", "Fi", "Se"],
+  ISTP: ["Ti", "Se", "Ni", "Fe"], ISFP: ["Fi", "Se", "Ni", "Te"], INFP: ["Fi", "Ne", "Si", "Te"], INTP: ["Ti", "Ne", "Si", "Fe"],
+  ESTP: ["Se", "Ti", "Fe", "Ni"], ESFP: ["Se", "Fi", "Te", "Ni"], ENFP: ["Ne", "Fi", "Te", "Si"], ENTP: ["Ne", "Ti", "Fe", "Si"],
+  ESTJ: ["Te", "Si", "Ne", "Fi"], ESFJ: ["Fe", "Si", "Ne", "Ti"], ENFJ: ["Fe", "Ni", "Se", "Ti"], ENTJ: ["Te", "Ni", "Se", "Fi"]
+};
+const MBTI_LIST = Object.keys(STACKS);
+// 기능 → 십신 그룹 대응 (토론 합의: 유일한 갭 판정 엔진)
+const FUNC_SIBSIN = { Ne: [1], Se: [1, 2], Ni: [4], Si: [4], Te: [3, 2], Fe: [3], Ti: [0], Fi: [0] };
+
+// 갭 3구간
+const BANDS = [
+  { k: "통합형", label: "타고난 결대로 사는 중", copy: "태어난 코드와 지금의 당신이 거의 같은 방향을 보고 있어요. 원판 그대로, 순정 그대로.", pos: 12 },
+  { k: "반가면형", label: "필요한 만큼만 가면을 쓰는 중", copy: "원판은 그대로 두고, 세상에 나갈 때만 가면을 살짝 걸치는 타입. 벗는 법을 아는 가면은 무기예요.", pos: 50 },
+  { k: "후천개조형", label: "원판을 꽤 두껍게 덮어쓴 중", copy: "당신은 태어난 나를 꽤 두껍게 덮어썼습니다. 그건 그만큼 치열하게 적응해왔다는 훈장이기도 해요.", pos: 86 }
+];
+
+// 오늘의 한마디 풀
+const TODAY_POOL = [
+  "오늘은 원판대로 살아도 아무 일도 일어나지 않는 날.",
+  "덮어쓴 가면이 무겁게 느껴지면, 오늘 하루만 반쯤 벗어두세요.",
+  "당신의 기본값을 좋아하는 사람이 생각보다 가까이 있습니다.",
+  "오늘의 피로는 성격 탓이 아니라 그냥 수면 부족일 확률 90%.",
+  "타고난 결을 거스르는 일은 오후로 미루세요. 오전의 당신은 원판입니다.",
+  "누군가의 첫인상 평가는 당신의 패치노트만 읽은 겁니다. 원본 코드는 못 봤어요.",
+  "오늘은 열등기능이 튀어나오기 좋은 날씨. 커피를 줄이세요.",
+  "적응하느라 애쓴 당신, 오늘은 애쓰지 않는 것도 능력입니다.",
+  "원판과 패치가 싸우면, 오늘은 원판 편을 들어주세요.",
+  "지금 미루고 있는 그 일, 당신 기질에는 원래 안 맞는 게 정상입니다.",
+  "오늘 마주칠 무례함은 당신의 원판을 시험하러 온 NPC입니다.",
+  "쉬는 것도 계획이 필요한 당신이라면, 지금 이 문장이 그 계획입니다.",
+  "당신이 덮어쓴 버전도, 원판도, 둘 다 정품입니다.",
+  "오늘의 운세: 대체로 맑음, 한때 열등기능.",
+  "남의 원판을 부러워하는 순간 내 원판의 장점이 로그아웃합니다."
+];
+
+/* ---------- 5. SVG 캐릭터 엔진 (베이스 10 × 소품 8 × 표정 2) ---------- */
+const CharSVG = {
+  // 표정: E=활짝(오픈 스마일) / I=지그시(큰 점눈 + ω 입). simple=true면 서브 하이라이트 생략(mini용)
+  face(ei, cx, cy, simple) {
+    const eyeY = cy - 3; // 눈을 낮춰 베이비 스키마
+    if (ei === "E") {
+      return `<path d="M ${cx - 27} ${eyeY} q 8 -12 16 0" stroke="#4A3B66" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+        <path d="M ${cx + 11} ${eyeY} q 8 -12 16 0" stroke="#4A3B66" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+        <path d="M ${cx - 9} ${cy + 12} q 9 13 18 0 q -9 5 -18 0 z" fill="#8A5A6B"/>
+        <path d="M ${cx - 4.5} ${cy + 17} q 4.5 4.5 9 0 q -3 3.5 -9 0 z" fill="#FFA7B8"/>`;
+    }
+    const subHi = simple ? "" : `<circle cx="${cx - 16.5}" cy="${eyeY + 3}" r="1.3" fill="#FFF" opacity=".7"/>
+      <circle cx="${cx + 21.5}" cy="${eyeY + 3}" r="1.3" fill="#FFF" opacity=".7"/>`;
+    return `<circle cx="${cx - 19}" cy="${eyeY}" r="8" fill="#4A3B66"/>
+      <circle cx="${cx + 19}" cy="${eyeY}" r="8" fill="#4A3B66"/>
+      <circle cx="${cx - 21.5}" cy="${eyeY - 2.5}" r="2.8" fill="#FFF"/>
+      <circle cx="${cx + 16.5}" cy="${eyeY - 2.5}" r="2.8" fill="#FFF"/>${subHi}
+      <path d="M ${cx - 9} ${cy + 12} q 4.5 5 9 1 q 4.5 4 9 -1" stroke="#4A3B66" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+  },
+  blush(cx, cy) {
+    return `<ellipse cx="${cx - 36}" cy="${cy + 9}" rx="12" ry="7" fill="#FF9DBB" opacity="var(--blush,0.55)"/>
+      <ellipse cx="${cx + 36}" cy="${cy + 9}" rx="12" ry="7" fill="#FF9DBB" opacity="var(--blush,0.55)"/>`;
+  },
+  // 베이스 10종: [몸체 path, 얼굴 중심 cx cy, 머리 위 모티프]
+  base(stemIdx, main, sub, uid) {
+    const F = []; // [body, faceCx, faceCy]
+    switch (stemIdx) {
+      case 0: // 갑목 — 쭉 뻗은 새싹 요정 (통통하게 완화, '뻗음'은 새싹 모티프가 담당)
+        return { body: `<ellipse cx="120" cy="140" rx="65" ry="72" fill="${main}"/>`,
+          motif: `<path d="M120 62 q-4 -26 -30 -32 q16 24 22 34 z" fill="${sub}"/><path d="M120 62 q4 -26 30 -32 q-16 24 -22 34 z" fill="${sub}"/><line x1="120" y1="66" x2="120" y2="52" stroke="${sub}" stroke-width="6" stroke-linecap="round"/>`,
+          cx: 120, cy: 132 };
+      case 1: // 을목 — 도토리 새싹
+        return { body: `<ellipse cx="120" cy="146" rx="66" ry="66" fill="${main}"/>`,
+          motif: `<path d="M120 80 q-2 -18 12 -30 q6 18 -4 32 z" fill="${sub}"/><path d="M118 82 q-14 -6 -16 -22 q14 4 20 18 z" fill="${sub}" opacity=".8"/>`,
+          cx: 120, cy: 142 };
+      case 2: // 병화 — 태양 불꽃 크라운
+        return { body: `<circle cx="120" cy="142" r="66" fill="url(#g${uid})"/>`,
+          motif: `<path d="M84 92 q-2 -20 10 -30 q2 14 10 20 q10 -22 26 -26 q-4 18 4 26 q12 -12 26 -8 q-10 12 -6 24 z" fill="${sub}"/>`,
+          cx: 120, cy: 140,
+          defs: `<radialGradient id="g${uid}" cx="50%" cy="38%"><stop offset="0%" stop-color="#FFEDB8"/><stop offset="100%" stop-color="${main}"/></radialGradient>` };
+      case 3: // 정화 — 촛불
+        return { body: `<path d="M120 74 C165 74 186 112 186 148 C186 190 156 210 120 210 C84 210 54 190 54 148 C54 112 75 74 120 74 z" fill="${main}"/>`,
+          motif: `<path d="M120 70 C132 56 128 42 120 32 C112 42 108 56 120 70 z" fill="${sub}"/><path d="M120 66 C126 58 124 50 120 44 C116 50 114 58 120 66 z" fill="#FFE3A8"/>`,
+          cx: 120, cy: 144 };
+      case 4: // 무토 — 산
+        return { body: `<path d="M120 66 C178 66 196 130 196 162 C196 196 168 212 120 212 C72 212 44 196 44 162 C44 130 62 66 120 66 z" fill="${main}"/>`,
+          motif: `<path d="M112 62 q-2 -14 -12 -18 q2 12 6 18 z" fill="#7FCFA4"/><path d="M120 60 q0 -16 6 -22 q6 10 0 22 z" fill="#7FCFA4"/><path d="M128 62 q8 -10 16 -10 q-6 10 -12 14 z" fill="#7FCFA4"/>`,
+          cx: 120, cy: 148 };
+      case 5: // 기토 — 밭 (낮고 포근 + 조약돌)
+        return { body: `<ellipse cx="120" cy="152" rx="76" ry="60" fill="${main}"/>`,
+          motif: `<circle cx="78" cy="188" r="9" fill="${sub}" opacity=".6"/><circle cx="162" cy="184" r="7" fill="${sub}" opacity=".6"/><circle cx="120" cy="196" r="6" fill="${sub}" opacity=".5"/>`,
+          cx: 120, cy: 144 };
+      case 6: // 경금 — 무쇠 (각진 광택)
+        return { body: `<rect x="52" y="76" width="136" height="136" rx="38" fill="${main}"/>`,
+          motif: `<path d="M70 96 L96 76 L112 76 L74 112 z" fill="#FFFFFF" opacity=".55"/><path d="M84 120 L128 76 L138 76 L88 130 z" fill="#FFFFFF" opacity=".35"/>`,
+          cx: 120, cy: 146 };
+      case 7: // 신금 — 보석
+        return { body: `<circle cx="120" cy="148" r="64" fill="${main}"/>`,
+          motif: `<path d="M120 34 L128 52 L148 54 L133 66 L138 84 L120 74 L102 84 L107 66 L92 54 L112 52 z" fill="${sub}"/><circle cx="146" cy="42" r="3.5" fill="#FFFFFF"/><circle cx="96" cy="38" r="2.5" fill="#FFFFFF"/>`,
+          cx: 120, cy: 144 };
+      case 8: // 임수 — 큰 물방울
+        return { body: `<path d="M120 40 C158 84 184 118 184 156 C184 192 156 214 120 214 C84 214 56 192 56 156 C56 118 82 84 120 40 z" fill="${main}"/>`,
+          motif: `<path d="M88 148 q14 -34 34 -44" stroke="#FFFFFF" stroke-width="8" fill="none" opacity=".5" stroke-linecap="round"/>`,
+          cx: 120, cy: 152 };
+      default: // 계수 — 작은 이슬방울
+        return { body: `<path d="M120 62 C148 96 166 122 166 152 C166 182 146 200 120 200 C94 200 74 182 74 152 C74 122 92 96 120 62 z" fill="${main}"/>`,
+          motif: `<path d="M92 66 C98 74 98 82 92 88 C86 82 86 74 92 66 z" fill="${sub}" opacity=".7"/><path d="M152 52 C157 58 157 65 152 70 C147 65 147 58 152 52 z" fill="${sub}" opacity=".55"/>`,
+          cx: 120, cy: 150 };
+    }
+  },
+  // 주기능 소품 8종
+  accessory(funcK, cx, cy, sub) {
+    switch (funcK) {
+      case "Ne": return `<g stroke="#F2B94B" stroke-width="3" fill="#F2B94B"><path d="M${cx-34} ${cy-72} l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 z" stroke="none"/><path d="M${cx} ${cy-86} l3.5 9 9 3.5 -9 3.5 -3.5 9 -3.5 -9 -9 -3.5 9 -3.5 z" stroke="none"/><path d="M${cx+34} ${cy-72} l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 z" stroke="none"/></g>`;
+      case "Ni": return `<g><path d="M${cx} ${cy-88} l5 13 13 5 -13 5 -5 13 -5 -13 -13 -5 13 -5 z" fill="#F2B94B"/><line x1="${cx-30}" y1="${cy-52}" x2="${cx-9}" y2="${cy-66}" stroke="#F2B94B" stroke-width="2.5" opacity=".7"/><line x1="${cx+30}" y1="${cy-52}" x2="${cx+9}" y2="${cy-66}" stroke="#F2B94B" stroke-width="2.5" opacity=".7"/></g>`;
+      case "Se": return `<g transform="translate(${cx+52},${cy+26}) rotate(24)"><circle cx="0" cy="0" r="15" fill="rgba(255,255,255,.5)" stroke="#5C5478" stroke-width="5"/><line x1="10" y1="11" x2="24" y2="26" stroke="#5C5478" stroke-width="7" stroke-linecap="round"/></g>`;
+      case "Si": return `<g transform="translate(${cx-70},${cy+18}) rotate(-10)"><rect x="0" y="0" width="34" height="30" rx="5" fill="#FFF" stroke="#5C5478" stroke-width="3.5"/><circle cx="17" cy="13" r="6.5" fill="#AEDFF7"/><rect x="6" y="22" width="22" height="4" rx="2" fill="#D8CFF0"/></g>`;
+      case "Te": return `<g transform="translate(${cx+46},${cy+8}) rotate(12)"><rect x="0" y="0" width="30" height="40" rx="5" fill="#FFF" stroke="#5C5478" stroke-width="3.5"/><rect x="8" y="-5" width="14" height="9" rx="3" fill="#5C5478"/><line x1="7" y1="12" x2="23" y2="12" stroke="#B4A9D4" stroke-width="3" stroke-linecap="round"/><line x1="7" y1="20" x2="23" y2="20" stroke="#B4A9D4" stroke-width="3" stroke-linecap="round"/><line x1="7" y1="28" x2="18" y2="28" stroke="#B4A9D4" stroke-width="3" stroke-linecap="round"/></g>`;
+      case "Ti": return `<g><circle cx="${cx+19}" cy="${cy-3}" r="14" fill="none" stroke="#5C5478" stroke-width="4"/><line x1="${cx+32}" y1="${cy+6}" x2="${cx+40}" y2="${cy+26}" stroke="#5C5478" stroke-width="3"/><circle cx="${cx+40}" cy="${cy+29}" r="3" fill="#5C5478"/></g>`;
+      case "Fe": return `<g fill="#FF8FA8"><path d="M${cx-52} ${cy-56} c-5 -8 -17 -5 -17 4 c0 8 10 13 17 18 c7 -5 17 -10 17 -18 c0 -9 -12 -12 -17 -4 z"/><path d="M${cx+52} ${cy-44} c-4 -6 -13 -4 -13 3 c0 6 8 10 13 14 c5 -4 13 -8 13 -14 c0 -7 -9 -9 -13 -3 z" opacity=".8"/></g>`;
+      default: return `<g><path d="M${cx} ${cy+34} c-4 -6 -13 -4 -13 3 c0 6 8 10 13 14 c5 -4 13 -8 13 -14 c0 -7 -9 -9 -13 -3 z" fill="#FFB25C"/><circle cx="${cx}" cy="${cy+42}" r="17" fill="none" stroke="#FFB25C" stroke-width="3" opacity=".55"/></g>`;
+    }
+  },
+  // 완성 캐릭터 SVG (shadow: 열등기능 그림자 미니미)
+  render(stemIdx, funcK, ei, opts = {}) {
+    const uid = "c" + stemIdx + funcK + (opts.uid || "");
+    const elem = ELEMS[STEM_ELEM[stemIdx]];
+    const b = this.base(stemIdx, elem.main, elem.sub, uid);
+    let shadow = "";
+    if (opts.shadowStem !== undefined && opts.shadowStem !== null) {
+      const sElem = ELEMS[STEM_ELEM[opts.shadowStem]];
+      const sb = this.base(stemIdx, sElem.dark, sElem.dark, uid + "s");
+      shadow = `<g transform="translate(58,20) scale(.56)" opacity=".28">${sb.defs || ""}${sb.body}${sb.motif}</g>`;
+    }
+    const size = opts.size || 200;
+    // 말랑한 배 하이라이트 + 반짝이 2개 (큰 렌더에만, Ne 소품과 겹치면 생략)
+    const belly = `<ellipse cx="${b.cx}" cy="${b.cy + 34}" rx="30" ry="18" fill="#FFFFFF" opacity=".22"/>`;
+    const sparkle = (size >= 150 && funcK !== "Ne")
+      ? `<path d="M ${b.cx - 62} ${b.cy - 52} l2.5 6.5 6.5 2.5 -6.5 2.5 -2.5 6.5 -2.5 -6.5 -6.5 -2.5 6.5 -2.5 z" fill="#FFD84D" opacity=".85"/>
+         <circle cx="${b.cx + 66}" cy="${b.cy - 38}" r="3" fill="#FFD84D" opacity=".6"/>` : "";
+    return `<svg viewBox="0 0 240 240" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" style="${opts.style || ""}">
+      ${b.defs ? `<defs>${b.defs}</defs>` : ""}
+      ${shadow}
+      <g>${b.body}${belly}${b.motif}${this.face(ei, b.cx, b.cy, size < 120)}${this.blush(b.cx, b.cy)}${funcK ? this.accessory(funcK, b.cx, b.cy, elem.sub) : ""}${sparkle}</g>
+    </svg>`;
+  },
+  mini(stemIdx, ei, size = 72, flip = false) {
+    const elem = ELEMS[STEM_ELEM[stemIdx]];
+    const b = this.base(stemIdx, elem.main, elem.sub, "m" + stemIdx + (flip ? "f" : ""));
+    return `<svg viewBox="0 0 240 240" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${b.defs ? `<defs>${b.defs}</defs>` : ""}<g ${flip ? 'transform="translate(240,0) scale(-1,1)"' : ""}>${b.body}<ellipse cx="${b.cx}" cy="${b.cy + 34}" rx="30" ry="18" fill="#FFFFFF" opacity=".22"/>${b.motif}${this.face(ei, b.cx, b.cy, true)}${this.blush(b.cx, b.cy)}</g></svg>`;
+  }
+};
+
+/* ---------- 6. 해석 엔진 ---------- */
+// 받침 유무에 따른 조사 선택: josa("수","을/를") → "수를"
+function josa(word, pair) {
+  const [a, b] = pair.split("/");
+  const code = word.charCodeAt(word.length - 1);
+  const hasBatchim = code >= 0xAC00 && code <= 0xD7A3 && (code - 0xAC00) % 28 !== 0;
+  return word + (hasBatchim ? a : b);
+}
+const Engine = {
+  analyze(input) {
+    const { y, m, d, hourIdx, mbti, nick, est } = input;
+    const p = Calc.saju(y, m, d, hourIdx);
+    const dayStem = p.day.stem;
+    const dayElem = STEM_ELEM[dayStem];
+    // 십신 분포 (일간 자신 제외)
+    const chars = [
+      { e: STEM_ELEM[p.year.stem] }, { e: BRANCH_ELEM[p.year.branch] },
+      { e: STEM_ELEM[p.month.stem] }, { e: BRANCH_ELEM[p.month.branch] },
+      { e: BRANCH_ELEM[p.day.branch] }
+    ];
+    if (p.hour) chars.push({ e: STEM_ELEM[p.hour.stem] }, { e: BRANCH_ELEM[p.hour.branch] });
+    const sibCount = [0, 0, 0, 0, 0];
+    chars.forEach(c => sibCount[sibsinOf(dayElem, c.e)]++);
+    // 오행 분포 (일간 포함 전체 글자)
+    const elemCount = [0, 0, 0, 0, 0];
+    elemCount[dayElem]++;
+    chars.forEach(c => elemCount[c.e]++);
+    // 지배 십신 상위 2그룹
+    const ranked = [0, 1, 2, 3, 4].sort((a, b2) => sibCount[b2] - sibCount[a] || a - b2);
+    const top2 = ranked.slice(0, 2).filter(i => sibCount[i] > 0);
+    // 갭 판정: 주기능(×2) + 부기능(×1) 이 상위 십신과 맞물리는가
+    const stack = STACKS[mbti];
+    const domMatch = FUNC_SIBSIN[stack[0]].some(s => top2.includes(s));
+    const auxMatch = FUNC_SIBSIN[stack[1]].some(s => top2.includes(s));
+    const score = (domMatch ? 2 : 0) + (auxMatch ? 1 : 0); // 0~3
+    const band = score >= 3 ? 0 : score >= 1 ? 1 : 2;
+    // 온도차 (구간 은유 단위 — 5도 단위 대역)
+    const temp = [10, 15, 30, 40, 55, 70][band === 0 ? (domMatch && auxMatch ? 0 : 1) : band === 1 ? (score === 2 ? 2 : 3) : (sibCount[ranked[0]] >= 3 ? 5 : 4)];
+    return {
+      p, dayStem, dayElem, sibCount, elemCount, top2, stack, band, temp, score,
+      nickname: `${STEMS[dayStem].mod} ${FUNCS[stack[0]].noun}`,
+      title: `${STEMS[dayStem].name} ${mbti}`,
+      input
+    };
+  },
+  gapCopy(r) {
+    const dom = SIBSIN[r.top2[0]];
+    const f = FUNCS[r.stack[0]];
+    if (r.band === 0) return `타고난 ${dom.name}의 기운과 ${f.name}(${r.stack[0]}) 선호가 같은 방향을 봅니다. ${BANDS[0].copy}`;
+    if (r.band === 1) return `원판의 중심은 ${dom.name}(${dom.desc})인데, 살아남은 당신은 ${f.name}(${r.stack[0]}) 쪽을 앞세우는 법을 배웠어요. ${BANDS[1].copy}`;
+    return `원판의 중심은 ${dom.name}(${dom.desc})이지만, 지금의 당신은 ${f.name}(${r.stack[0]})${josa(f.name, "으로/로").slice(f.name.length)} 세상을 만나고 있어요. ${BANDS[2].copy}`;
+  },
+  vsRows(r) {
+    const dom = SIBSIN[r.top2[0]];
+    const ei = r.input.mbti[0];
+    const judging = r.stack.find(f2 => "TeTiFeFi".includes(f2));
+    return [
+      { axis: "에너지", saju: dom.energy, mbti: ei === "E" ? `바깥 세계와 접속할 때 충전됩니다 (주기능 ${r.stack[0]}가 밖을 향함)` : `안의 세계로 돌아올 때 충전됩니다 (주기능 ${r.stack[0]}가 안을 향함)` },
+      { axis: "결정", saju: STEMS[r.dayStem].decide, mbti: `${FUNCS[judging].name}(${judging})의 문법 — ${FUNCS[judging].os.split(".")[0]}.` },
+      { axis: "스트레스", saju: ELEM_STRESS[r.dayElem], mbti: `열등기능 ${r.stack[3]} 발동 — ${FUNCS[r.stack[3]].grip}` }
+    ];
+  },
+  today(r) {
+    const t = new Date();
+    const seed = t.getFullYear() * 10000 + (t.getMonth() + 1) * 100 + t.getDate();
+    return TODAY_POOL[(seed + r.dayStem * 7 + MBTI_LIST.indexOf(r.input.mbti) * 3) % TODAY_POOL.length];
+  },
+  compat(a, b) {
+    const sA = a.dayStem, sB = b.dayStem, eA = STEM_ELEM[sA], eB = STEM_ELEM[sB];
+    let temp, lines = [];
+    if (sA % 5 === sB % 5 && sA !== sB) { temp = 95; lines.push(`${josa(STEMS[sA].name, "과/와")} ${josa(STEMS[sB].name, "은/는")} <b>천간합(天干合)</b> — 명리에서 서로 없는 것을 정확히 메워주는 짝으로 봅니다.`); }
+    else if (eA === eB) { temp = 85; lines.push(`둘 다 ${ELEMS[eA].k}(${ELEMS[eA].name})의 결 — 말 안 해도 통하는 같은 재질입니다.`); }
+    else if ((eA + 1) % 5 === eB) { temp = 90; lines.push(`${josa(ELEMS[eA].k, "이/가")} ${josa(ELEMS[eB].k, "을/를")} 낳는 <b>상생</b> — ${josa(STEMS[sA].name, "이/가")} ${josa(STEMS[sB].name, "을/를")} 자라게 하는 조합.`); }
+    else if ((eB + 1) % 5 === eA) { temp = 90; lines.push(`${josa(ELEMS[eB].k, "이/가")} ${josa(ELEMS[eA].k, "을/를")} 낳는 <b>상생</b> — ${josa(STEMS[sB].name, "이/가")} ${josa(STEMS[sA].name, "을/를")} 자라게 하는 조합.`); }
+    else { temp = 75; lines.push(`${josa(ELEMS[eA].k, "과/와")} ${josa(ELEMS[eB].k, "은/는")} <b>상극</b> — 하지만 명리에서 극(克)은 서로를 조각해 완성하는 관계이기도 합니다.`); }
+    if ((a.p.day.branch + b.p.day.branch) % 12 === 1) { temp = Math.min(99, temp + 4); lines.push(`일지가 <b>지지육합(六合)</b>! 일상 리듬이 자석처럼 맞물리는 보너스가 붙었어요.`); }
+    const shared = STACKS[a.input.mbti].slice(0, 2).filter(f => STACKS[b.input.mbti].slice(0, 2).includes(f)).length;
+    lines.push(shared >= 1 ? `MBTI 상위 인지기능도 ${shared}개 겹칩니다 — 세상을 처리하는 언어가 비슷해요.` : `MBTI 인지기능은 서로 다른 언어 — 번역이 필요하지만, 그래서 서로에게 새로운 세계입니다.`);
+    return { temp, lines };
+  }
+};
+
+/* ---------- 7. 앱 컨트롤러 ---------- */
+const HOURS = ["자시 (23:00~00:59)", "축시 (01:00~02:59)", "인시 (03:00~04:59)", "묘시 (05:00~06:59)", "진시 (07:00~08:59)", "사시 (09:00~10:59)", "오시 (11:00~12:59)", "미시 (13:00~14:59)", "신시 (15:00~16:59)", "유시 (17:00~18:59)", "술시 (19:00~20:59)", "해시 (21:00~22:59)"];
+const MT_QUESTIONS = [
+  { f: "Ni", q: "처음 보는 문제도 '결국 이렇게 될 것 같다'는 그림이 먼저 떠오른다." },
+  { f: "Ne", q: "하나의 이야기에서 곁가지 아이디어가 계속 뻗어나가 수습이 안 된다." },
+  { f: "Si", q: "예전에 해봤던 방식과 그때의 디테일을 잘 기억하고 기준으로 삼는다." },
+  { f: "Se", q: "지금 눈앞의 변화(표정, 소리, 움직임)를 남들보다 빨리 알아챈다." },
+  { f: "Ti", q: "어떤 말을 들으면 내용의 앞뒤가 논리적으로 맞는지부터 따져본다." },
+  { f: "Te", q: "일이 생기면 일단 목표와 순서, 마감부터 정리해야 마음이 놓인다." },
+  { f: "Fi", q: "내 가치관에 어긋나는 일은 아무리 이득이라도 몸이 거부한다." },
+  { f: "Fe", q: "어느 자리에 가든 그 공간의 분위기와 사람들 기분을 자동으로 살핀다." }
+];
+const DOM_AUX_TYPE = { NiTe: "INTJ", NiFe: "INFJ", NeTi: "ENTP", NeFi: "ENFP", SiTe: "ISTJ", SiFe: "ISFJ", SeTi: "ESTP", SeFi: "ESFP", TiNe: "INTP", TiSe: "ISTP", TeNi: "ENTJ", TeSi: "ESTJ", FiNe: "INFP", FiSe: "ISFP", FeNi: "ENFJ", FeSi: "ESFJ" };
+
+const App = {
+  state: { cal: "sol", mbti: null, est: false, step: 1, vsCode: null },
+  mt: { idx: 0, scores: {} },
+
+  init() {
+    // 몽글 배경 데코: 구름(상단) + 반짝이 ✦ + 하트 ♥ (총 15개 이하)
+    const deco = document.getElementById("stars");
+    let html = "";
+    for (let i = 0; i < 4; i++) {
+      const sc = .7 + Math.random() * .7;
+      html += `<div class="deco deco-cloud" style="left:${5 + Math.random() * 80}%;top:${2 + Math.random() * 26}%;transform:scale(${sc});animation-delay:${Math.random() * 6}s"></div>`;
+    }
+    for (let i = 0; i < 7; i++) html += `<div class="deco deco-spark" style="left:${Math.random() * 94}%;top:${Math.random() * 92}%;animation-delay:${Math.random() * 6}s">✦</div>`;
+    for (let i = 0; i < 4; i++) html += `<div class="deco deco-heart" style="left:${Math.random() * 94}%;top:${20 + Math.random() * 72}%;animation-delay:${Math.random() * 6}s">♥</div>`;
+    deco.innerHTML = html;
+    // 히어로 캐릭터
+    document.getElementById("hero-chars").innerHTML =
+      CharSVG.mini(2, "E", 64) + CharSVG.mini(9, "I", 56) + CharSVG.mini(0, "E", 60) + CharSVG.mini(7, "I", 56) + CharSVG.mini(8, "E", 64);
+    // 셀렉트 채우기
+    const sy = document.getElementById("sel-y"), sm = document.getElementById("sel-m"), sh = document.getElementById("sel-h");
+    const nowY = new Date().getFullYear();
+    let o = "";
+    for (let y = nowY; y >= 1930; y--) o += `<option value="${y}" ${y === 1995 ? "selected" : ""}>${y}년</option>`;
+    sy.innerHTML = o;
+    o = "";
+    for (let m = 1; m <= 12; m++) o += `<option value="${m}">${m}월</option>`;
+    sm.innerHTML = o;
+    this.fillDays();
+    sy.onchange = sm.onchange = () => this.fillDays();
+    o = `<option value="-1">모름 (시주 없이 계산)</option>`;
+    HOURS.forEach((h, i) => o += `<option value="${i}">${h}</option>`);
+    sh.innerHTML = o;
+    // MBTI 그리드
+    document.getElementById("mbti-grid").innerHTML = MBTI_LIST.map(t => `<button onclick="App.pickMbti('${t}',this)">${t}</button>`).join("");
+    // 공유 URL 진입
+    const hash = location.hash;
+    if (hash.startsWith("#r=")) {
+      try {
+        const data = JSON.parse(decodeURIComponent(escape(atob(hash.slice(3).replace(/-/g, "+").replace(/_/g, "/")))));
+        this.showResult(Engine.analyze(data), { friend: true });
+        return;
+      } catch (e) { /* 잘못된 코드는 무시 */ }
+    }
+    try { if (localStorage.getItem("wonpan_last")) document.getElementById("btn-lastresult").style.display = "inline-flex"; } catch (e) { /* 스토리지 차단 환경 */ }
+    // 어떤 오류도 조용히 죽지 않도록: 화면 토스트로 표시
+    window.addEventListener("error", ev => this.toast("⚠️ 오류: " + (ev.message || "알 수 없는 오류")));
+  },
+
+  fillDays() {
+    const y = +document.getElementById("sel-y").value, m = +document.getElementById("sel-m").value;
+    const sd = document.getElementById("sel-d");
+    const prev = +sd.value || 1;
+    const max = this.state.cal === "lun" ? 30 : new Date(y, m, 0).getDate();
+    let o = "";
+    for (let d = 1; d <= max; d++) o += `<option value="${d}" ${d === Math.min(prev, max) ? "selected" : ""}>${d}일</option>`;
+    sd.innerHTML = o;
+  },
+
+  go(screen) { document.body.dataset.screen = screen; window.scrollTo(0, 0); },
+  start() { this.state.vsCode = null; this.go("input"); this.showStep(1); },
+  showStep(n) {
+    this.state.step = n;
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById("step" + i).classList.toggle("on", i === n);
+      document.getElementById("pg" + i).classList.toggle("on", i <= n);
+    }
+    window.scrollTo(0, 0);
+  },
+  setCal(c) {
+    this.state.cal = c;
+    document.getElementById("cal-sol").classList.toggle("on", c === "sol");
+    document.getElementById("cal-lun").classList.toggle("on", c === "lun");
+    document.getElementById("leap-row").classList.toggle("show", c === "lun");
+    this.fillDays();
+  },
+  next1() {
+    const y = +document.getElementById("sel-y").value, m = +document.getElementById("sel-m").value, d = +document.getElementById("sel-d").value;
+    const err = document.getElementById("err1");
+    if (this.state.cal === "lun") {
+      const leap = document.getElementById("leap-chk").checked;
+      const sol = Calc.lunarToSolar(y, m, d, leap);
+      if (!sol) { err.textContent = leap ? `${y}년 ${m}월은 윤달이 아니거나 그 날짜가 없어요. 윤달 체크를 확인해주세요.` : `음력 ${y}년 ${m}월 ${d}일은 존재하지 않는 날짜예요.`; return; }
+    }
+    err.textContent = "";
+    this.showStep(2);
+  },
+  pickMbti(t, btn) {
+    this.state.mbti = t; this.state.est = false;
+    document.querySelectorAll("#mbti-grid button").forEach(b => b.classList.toggle("on", b === btn));
+    document.getElementById("mbti-unknown").classList.remove("on");
+    document.getElementById("err2").textContent = "";
+  },
+  next2() {
+    if (!this.state.mbti) { document.getElementById("err2").textContent = "MBTI를 고르거나, 모르면 간이 추정을 해주세요!"; return; }
+    this.showStep(3);
+    setTimeout(() => document.getElementById("inp-nick").focus(), 100);
+  },
+
+  /* 간이 추정 (8문항 → 주기능 추정) */
+  openMiniTest() {
+    this.mt = { idx: 0, scores: {} };
+    document.getElementById("minitest").classList.add("show");
+    this.mtShow();
+  },
+  closeMiniTest() { document.getElementById("minitest").classList.remove("show"); },
+  mtShow() {
+    document.getElementById("mt-progress").textContent = `${this.mt.idx + 1} / 8`;
+    document.getElementById("mt-q").textContent = MT_QUESTIONS[this.mt.idx].q;
+  },
+  mtAnswer(v) {
+    this.mt.scores[MT_QUESTIONS[this.mt.idx].f] = v;
+    if (++this.mt.idx < 8) { this.mtShow(); return; }
+    // 주기능 = 최고점, 부기능 = 해당 주기능의 두 후보 중 점수 높은 쪽
+    const s = this.mt.scores;
+    const dom = Object.keys(s).sort((a, b) => s[b] - s[a])[0];
+    const auxCands = Object.keys(DOM_AUX_TYPE).filter(k => k.startsWith(dom)).map(k => k.slice(2));
+    const aux = auxCands.sort((a, b) => s[b] - s[a])[0];
+    const type = DOM_AUX_TYPE[dom + aux];
+    this.state.mbti = type; this.state.est = true;
+    this.closeMiniTest();
+    document.querySelectorAll("#mbti-grid button").forEach(b => b.classList.toggle("on", b.textContent === type));
+    const ub = document.getElementById("mbti-unknown");
+    ub.classList.add("on");
+    ub.textContent = `🤔 간이 추정 결과: ${type} (참고용이에요)`;
+    document.getElementById("err2").textContent = "";
+  },
+
+  submit() {
+    try {
+      const nick = document.getElementById("inp-nick").value.trim();
+      if (!nick) { document.getElementById("err3").textContent = "이름을 알려주세요!"; return; }
+      let y = +document.getElementById("sel-y").value, m = +document.getElementById("sel-m").value, d = +document.getElementById("sel-d").value;
+      const lun = this.state.cal === "lun", leap = lun && document.getElementById("leap-chk").checked;
+      if (lun) {
+        const sol = Calc.lunarToSolar(y, m, d, leap);
+        if (!sol) { document.getElementById("err3").textContent = "음력 날짜가 올바르지 않아요. 1단계에서 다시 확인해주세요."; this.showStep(1); return; }
+        y = sol.y; m = sol.m; d = sol.d;
+      }
+      const input = { y, m, d, hourIdx: +document.getElementById("sel-h").value, mbti: this.state.mbti, nick, est: this.state.est ? 1 : 0, lun: lun ? 1 : 0 };
+      try { localStorage.setItem("wonpan_last", JSON.stringify(input)); } catch (e) { /* 스토리지 차단 환경에서도 진행 */ }
+      const result = Engine.analyze(input);
+      // 로딩 연출
+      this.go("loading");
+      const msgs = ["만세력 펼치는 중…", "입춘 경계 확인 중…", "살아남은 당신과 대조 중…"];
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const stepMs = reduced ? 0 : 900;
+      const el = document.getElementById("loadmsg");
+      msgs.forEach((msg, i) => setTimeout(() => el.textContent = msg, stepMs * i));
+      setTimeout(() => {
+        try { this.showResult(result); }
+        catch (e) { this.toast("결과 생성 오류: " + e.message); this.go("input"); this.showStep(1); }
+      }, stepMs * 3);
+    } catch (e) {
+      this.toast("오류가 발생했어요: " + e.message);
+    }
+  },
+  loadLast() {
+    try {
+      const input = JSON.parse(localStorage.getItem("wonpan_last"));
+      this.showResult(Engine.analyze(input));
+    } catch (e) { localStorage.removeItem("wonpan_last"); }
+  },
+  clearData() {
+    try { localStorage.removeItem("wonpan_last"); } catch (e) { /* 무시 */ }
+    this.toast("브라우저에 저장된 기록을 지웠어요 🧹");
+    document.getElementById("btn-lastresult").style.display = "none";
+  },
+
+  encode(input) {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(input)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  },
+
+  /* ---------- 결과 렌더 ---------- */
+  showResult(r, opts = {}) {
+    this._r = r;
+    const elem = ELEMS[r.dayElem];
+    const band = BANDS[r.band];
+    const ei = r.input.mbti[0];
+    const stem = STEMS[r.dayStem];
+    const infFunc = r.stack[3];
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
+    const p = r.p;
+    const pillHtml = [["시주", p.hour], ["일주", p.day], ["월주", p.month], ["년주", p.year]].map(([label, pl]) =>
+      `<div class="pillar"><div class="pl">${label}</div>` + (pl
+        ? `<div class="pv">${STEM_NAMES[pl.stem]}${BRANCH_NAMES[pl.branch]}</div><div class="ph">${STEM_HANJA[pl.stem]}${BRANCH_HANJA[pl.branch]}</div>`
+        : `<div class="pv">—</div><div class="ph">모름</div>`) + `</div>`).join("");
+    const total = r.elemCount.reduce((a, b) => a + b, 0);
+    const elemBar = r.elemCount.map((c, i) => c ? `<div style="flex:${c};background:${ELEMS[i].main}"></div>` : "").join("");
+    const elemLegend = r.elemCount.map((c, i) => `<span><i style="background:${ELEMS[i].main}"></i>${ELEMS[i].k} ${c}</span>`).join("");
+    const over = r.elemCount.map((c, i) => c >= 3 ? i : -1).filter(i => i >= 0);
+    const lack = r.elemCount.map((c, i) => c === 0 ? i : -1).filter(i => i >= 0);
+    let elemComment = "";
+    if (over.length) elemComment += `${over.map(i => ELEMS[i].k).join("·")}의 기운이 유난히 진합니다 — 이 결이 당신의 기본 배경음이에요. `;
+    if (lack.length) elemComment += `${lack.map(i => ELEMS[i].k).join("·")}의 기운은 옅은 편 — 그 영역은 타고나기보다 배워서 채우는 자리입니다.`;
+    if (!elemComment) elemComment = "오행이 고르게 분포된 편 — 특정 결에 쏠리지 않는 균형형입니다.";
+    const rows = Engine.vsRows(r);
+    const domSib = SIBSIN[r.top2[0]];
+    const myCode = this.encode(r.input);
+    const shareUrl = location.origin + location.pathname + "#r=" + myCode;
+    // 궁합 (URL로 초대받아 들어온 경우)
+    let compatHtml = "";
+    if (this.state.vsCode && !opts.friend) {
+      try {
+        const other = Engine.analyze(this.state.vsCode);
+        const cp = Engine.compat(r, other);
+        compatHtml = `<div class="card compat-card">
+          <h3>💞 ${other.input.nick}님과의 원판 궁합</h3>
+          <div class="cp-chars">${CharSVG.mini(r.dayStem, ei, 82)}<span class="cp-heart">💘</span>${CharSVG.mini(other.dayStem, other.input.mbti[0], 82, true)}</div>
+          <div class="cp-temp" style="color:${elem.dark}">궁합 온도 ${cp.temp}°</div>
+          ${cp.lines.map(l => `<p>${l}</p>`).join("")}
+        </div>`;
+      } catch (e) { /* 무시 */ }
+    }
+    const friendBanner = opts.friend
+      ? `<div class="friend-banner">🪐 <b>${r.input.nick}</b>님이 공유한 원판이에요. 아래에서 내 원판도 확인하고 궁합까지 볼 수 있어요!</div>` : "";
+    const friendCta = opts.friend
+      ? `<div class="share-grid"><button class="btn btn-primary wide" onclick="App.startVs('${myCode}')">내 원판 확인하고 궁합 보기 💞</button></div>` : "";
+
+    document.getElementById("result-wrap").innerHTML = `
+      ${friendBanner}
+      <div class="card capture-card" id="capture-card" style="background:linear-gradient(160deg,${elem.bg1},${elem.bg2})">
+        <div class="cc-inner">
+          <div class="cc-top"><span>🪐 원판 찾기</span><span>${dateStr}</span></div>
+          <div class="cc-charwrap"><div class="cc-halo"></div>${CharSVG.render(r.dayStem, r.stack[0], ei, { shadowStem: r.dayStem, uid: "main" })}</div>
+          <div class="cc-band" style="color:${elem.dark}">${band.k} · ${band.label}</div>
+          <div class="cc-title">${stem.name} ${r.input.mbti}</div>
+          <div class="cc-nick">${r.input.nick} — ${r.nickname}${r.input.est ? " (MBTI 간이추정)" : ""}</div>
+          <p class="cc-copy">${stem.desc}</p>
+          <div class="cc-temp" style="color:${elem.dark}">타고난 나 ↔ 살아남은 나 · 온도차 약 ${r.temp}°</div>
+          <div class="cc-foot">#원판찾기 #${stem.name} #${r.input.mbti}</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📏 원판과 현재 버전의 거리</h3>
+        <div class="gap-stage">
+          <div style="position:absolute;left:calc(50% - ${8 + r.temp * 1.6}px);transform:translateX(-100%);bottom:0">${CharSVG.mini(r.dayStem, "I", 88)}</div>
+          <div style="position:absolute;left:calc(50% + ${8 + r.temp * 1.6}px);bottom:0">${CharSVG.mini(r.dayStem, ei, 88, true)}</div>
+          <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:36px;font-size:.72rem;color:rgba(43,35,64,.4);font-weight:700">${r.band === 0 ? "🤝" : r.band === 1 ? "· · ·" : "· · · · · ·"}</div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:70px;font-size:.7rem;color:rgba(43,35,64,.5);font-weight:700;margin-bottom:10px"><span>타고난 나</span><span>살아남은 나</span></div>
+        <p class="gap-caption">${Engine.gapCopy(r)}</p>
+        <div class="gap-gauge"><div class="gap-pin" style="left:${band.pos}%"></div></div>
+        <div class="gap-scale"><span>통합형</span><span>반가면형</span><span>후천개조형</span></div>
+      </div>
+
+      <div class="card">
+        <h3>⚖️ 타고난 나 vs 살아남은 나</h3>
+        <table class="vs-table">
+          <tr><th class="axis"></th><th class="saju">🌱 원판 (사주)</th><th class="mbti">🎭 현재 (MBTI)</th></tr>
+          ${rows.map(row => `<tr><td class="axis">${row.axis}</td><td>${row.saju}</td><td>${row.mbti}</td></tr>`).join("")}
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>🌘 숨겨진 모드 — 지쳤을 때의 당신</h3>
+        <div class="hidden-mode">
+          <div class="hm-char">${CharSVG.render(r.dayStem, null, "I", { size: 84, uid: "hm", style: "filter:saturate(.4) brightness(.75)" })}</div>
+          <div class="hm-body">
+            <p>배터리가 바닥나면, ${stem.obj} 안에 잠들어 있던 <b>${FUNCS[infFunc].name}(${infFunc})</b> 그림자가 깨어납니다. ${FUNCS[infFunc].grip}.</p>
+            <div class="hm-sig">${FUNCS[infFunc].sig.map(s => `<span>⚡ ${s}</span>`).join("")}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card today-card">
+        <h3>🔮 오늘의 한마디</h3>
+        <p>${Engine.today(r)}</p>
+      </div>
+
+      <details class="deep">
+        <summary>🔍 더 깊이 보기 — 사주팔자 · 오행 · 인지기능</summary>
+        <div class="deep-inner">
+          <div class="deep-block">
+            <h4>당신의 사주팔자 ${r.input.lun ? "(음력 입력을 양력으로 변환해 계산)" : ""}</h4>
+            <div class="pillars">${pillHtml}</div>
+            <p>해석의 중심은 <b>일간(일주의 천간) ${STEM_NAMES[r.dayStem]}${STEM_HANJA[r.dayStem]}</b> — 명리학에서 '나 자신'을 뜻하는 글자입니다. ${stem.kw}의 결.</p>
+          </div>
+          <div class="deep-block">
+            <h4>오행 분포</h4>
+            <div class="elem-bar">${elemBar}</div>
+            <div class="elem-legend">${elemLegend}</div>
+            <p style="margin-top:8px">${elemComment}</p>
+          </div>
+          <div class="deep-block">
+            <h4>원판의 동력 구조 (십신)</h4>
+            <p>당신의 팔자에서 가장 진한 동력은 <b>${domSib.k}(${domSib.name})</b> — ${domSib.desc}. ${r.top2[1] !== undefined ? `그 다음은 <b>${SIBSIN[r.top2[1]].k}(${SIBSIN[r.top2[1]].name})</b>입니다.` : ""}</p>
+          </div>
+          <div class="deep-block">
+            <h4>${r.input.mbti}의 인지기능 스택</h4>
+            <ul>
+              <li><b>주기능 ${r.stack[0]}</b> (${FUNCS[r.stack[0]].name}) — ${FUNCS[r.stack[0]].os}</li>
+              <li><b>부기능 ${r.stack[1]}</b> (${FUNCS[r.stack[1]].name}) — 두 번째 무기</li>
+              <li><b>3차기능 ${r.stack[2]}</b> (${FUNCS[r.stack[2]].name}) — 놀 때 나오는 나</li>
+              <li><b>열등기능 ${r.stack[3]}</b> (${FUNCS[r.stack[3]].name}) — 스트레스 때 튀어나오는 그림자</li>
+            </ul>
+          </div>
+        </div>
+      </details>
+
+      ${compatHtml}
+
+      ${friendCta || `<div class="share-grid">
+        <button class="btn btn-primary" onclick="App.saveCard('feed')">📷 피드용 저장 (4:5)</button>
+        <button class="btn btn-primary" onclick="App.saveCard('story')">📱 스토리용 저장 (9:16)</button>
+        <button class="btn btn-ghost wide" onclick="App.share()">🔗 결과 링크 공유 — 친구 궁합 초대</button>
+        <button class="btn btn-ghost" onclick="App.start()">다시 테스트</button>
+        <button class="btn btn-ghost" onclick="App.clearData()">기록 지우기</button>
+      </div>`}
+
+      <p class="foot-disclaimer">
+        본 서비스는 <b>오락·자기이해 목적</b>의 콘텐츠입니다. 사주와 MBTI 해석은 과학적 진단이 아니며,
+        채용·연애·투자 등 중요한 결정의 근거로 사용하지 마세요. (인사·연애 결정에 쓰면 심리학자가 웁니다)<br>
+        입력 정보는 서버로 전송되지 않고 이 브라우저에만 저장됩니다 · 만세력은 입춘/절기일 기준 계산
+        · 시간은 진태양시(약 ±30분) 미보정${r.input.est ? " · MBTI는 8문항 간이 추정이라 신뢰도가 낮아요" : ""}<br>
+        inspired by 운명 패치 🫧
+      </p>`;
+    this.go("result");
+    if (!opts.friend) history.replaceState(null, "", "#r=" + myCode);
+  },
+
+  startVs(friendCode) {
+    try { this.state.vsCode = JSON.parse(decodeURIComponent(escape(atob(friendCode.replace(/-/g, "+").replace(/_/g, "/"))))); } catch (e) { this.state.vsCode = null; }
+    history.replaceState(null, "", location.pathname);
+    this.go("input");
+    this.showStep(1);
+  },
+
+  share() {
+    const url = location.origin + location.pathname + "#r=" + this.encode(this._r.input);
+    const text = `🪐 나의 원판: ${this._r.title} — ${this._r.nickname}\n지금의 성격, 원래 내 걸까? 너도 확인해봐!`;
+    if (navigator.share) {
+      navigator.share({ title: "원판 찾기", text, url }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text + "\n" + url).then(() => this.toast("링크를 복사했어요! 친구에게 붙여넣기 📋"));
+    }
+  },
+
+  toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => t.classList.remove("show"), 2600);
+  },
+
+  /* ---------- 캡처 카드 저장 (순수 SVG → canvas → PNG) ---------- */
+  saveCard(mode) {
+    const r = this._r;
+    const elem = ELEMS[r.dayElem];
+    const band = BANDS[r.band];
+    const stem = STEMS[r.dayStem];
+    const ei = r.input.mbti[0];
+    const W = 1080, H = mode === "story" ? 1920 : 1350;
+    const cy = mode === "story" ? 285 : 0; // 스토리는 위아래 여백
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
+    const charSvg = CharSVG.render(r.dayStem, r.stack[0], ei, { shadowStem: r.dayStem, uid: "cap" })
+      .replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "").replace(/var\(--blush,0\.55\)/g, "0.55");
+    let stars = "";
+    if (mode === "story") for (let i = 0; i < 40; i++) {
+      stars += `<circle cx="${(i * 173) % W}" cy="${(i * 419) % H}" r="${1 + (i % 3)}" fill="#fff" opacity="${0.15 + (i % 5) * 0.1}"/>`;
+    }
+    const fontStack = `-apple-system,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${elem.bg1}"/><stop offset="1" stop-color="${elem.bg2}"/></linearGradient>
+        <linearGradient id="dark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B1B3A"/><stop offset="1" stop-color="#3D2C5C"/></linearGradient>
+        <radialGradient id="halo"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".9"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+      </defs>
+      ${mode === "story" ? `<rect width="${W}" height="${H}" fill="url(#dark)"/>${stars}<rect x="60" y="${cy - 60}" width="${W - 120}" height="1470" rx="48" fill="url(#bg)"/>` : `<rect width="${W}" height="${H}" fill="url(#bg)"/>`}
+      <text x="110" y="${cy + 90}" font-family="${fontStack}" font-size="34" font-weight="800" letter-spacing="6" fill="${elem.dark}">🪐 원판 찾기</text>
+      <text x="${W - 110}" y="${cy + 90}" font-family="${fontStack}" font-size="30" font-weight="700" fill="${elem.dark}" opacity=".6" text-anchor="end">${dateStr}</text>
+      <circle cx="${W / 2}" cy="${cy + 400}" r="290" fill="url(#halo)"/>
+      <g transform="translate(${W / 2 - 240},${cy + 160}) scale(2)">${charSvg}</g>
+      <text x="${W / 2}" y="${cy + 760}" font-family="${fontStack}" font-size="32" font-weight="800" letter-spacing="5" fill="${elem.dark}" text-anchor="middle" opacity=".75">${band.k} · ${band.label}</text>
+      <text x="${W / 2}" y="${cy + 845}" font-family="${fontStack}" font-size="68" font-weight="800" fill="#2B2340" text-anchor="middle">${stem.name} ${r.input.mbti}</text>
+      <text x="${W / 2}" y="${cy + 905}" font-family="${fontStack}" font-size="36" font-weight="700" fill="#2B2340" opacity=".6" text-anchor="middle">${r.input.nick} — ${r.nickname}</text>
+      <text x="${W / 2}" y="${cy + 985}" font-family="${fontStack}" font-size="34" fill="#2B2340" opacity=".85" text-anchor="middle">${stem.desc.split(". ")[0]}.</text>
+      <text x="${W / 2}" y="${cy + 1035}" font-family="${fontStack}" font-size="34" fill="#2B2340" opacity=".85" text-anchor="middle">${stem.desc.split(". ").slice(1).join(" ")}</text>
+      <rect x="${W / 2 - 260}" y="${cy + 1085}" width="520" height="66" rx="33" fill="#2B2340" opacity=".07"/>
+      <text x="${W / 2}" y="${cy + 1129}" font-family="${fontStack}" font-size="30" font-weight="800" fill="${elem.dark}" text-anchor="middle">타고난 나 ↔ 살아남은 나 · 온도차 약 ${r.temp}°</text>
+      <text x="${W / 2}" y="${cy + 1240}" font-family="${fontStack}" font-size="28" font-weight="700" fill="#2B2340" opacity=".45" text-anchor="middle">#원판찾기 #${stem.name} #${r.input.mbti}</text>
+      <text x="${W / 2}" y="${cy + 1290}" font-family="${fontStack}" font-size="26" font-weight="600" fill="#2B2340" opacity=".35" text-anchor="middle">${location.host || "wonpan"}</text>
+    </svg>`;
+    const img = new Image();
+    const blobUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = W; canvas.height = H;
+      canvas.getContext("2d").drawImage(img, 0, 0);
+      URL.revokeObjectURL(blobUrl);
+      canvas.toBlob(blob => {
+        if (!blob) { this.saveFallback(canvas); return; }
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `원판찾기_${r.title.replace(/\s/g, "_")}_${mode}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        this.toast("카드를 저장했어요! 📸");
+        // iOS 사파리 등 다운로드 미지원 대비 오버레이도 제공
+        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) this.saveFallback(canvas);
+      }, "image/png");
+    };
+    img.onerror = () => { URL.revokeObjectURL(blobUrl); this.toast("이미지 생성에 실패했어요 😢 스크린샷을 이용해주세요"); };
+    img.src = blobUrl;
+  },
+  saveFallback(canvas) {
+    document.getElementById("save-img").src = canvas.toDataURL("image/png");
+    document.getElementById("save-overlay").classList.add("show");
+  }
+};
+
+App.init();
+
+/* ---------- 8. 내장 검증 (콘솔 전용) ---------- */
+(function selfTest() {
+  const t = [];
+  const eq = (name, a, b) => t.push([name, JSON.stringify(a) === JSON.stringify(b), a, b]);
+  // 일주 앵커
+  eq("일주 1900-01-01=갑술(10)", (Calc.jdn(1900, 1, 1) + 49) % 60, 10);
+  eq("일주 2000-01-01=무오(54)", (Calc.jdn(2000, 1, 1) + 49) % 60, 54);
+  // 입춘
+  eq("입춘 2025=2/3", Calc.term(2025, 3), 3);
+  eq("입춘 2026=2/4", Calc.term(2026, 3), 4);
+  // 년주 경계: 2025-02-02 → 갑진년(전년), 2025-02-03 → 을사년
+  eq("입춘 전 년주", Calc.saju(2025, 2, 2, -1).year, { stem: 0, branch: 4 });
+  eq("입춘 후 년주", Calc.saju(2025, 2, 3, -1).year, { stem: 1, branch: 5 });
+  // 음력: 2025.1.1(음) = 2025-01-29(양)
+  eq("음력 설날 2025", Calc.lunarToSolar(2025, 1, 1, false), { d: 29, m: 1, y: 2025 });
+  eq("윤6월 2025 존재", Calc.lLeapMonth(2025), 6);
+  const fails = t.filter(x => !x[1]);
+  console.log(`[원판 찾기 self-test] ${t.length - fails.length}/${t.length} 통과`);
+  fails.forEach(f => console.warn("FAIL:", f[0], "got", f[2], "want", f[3]));
+})();
+</script>
+</body>
+</html>
