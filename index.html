@@ -122,6 +122,7 @@ select option{color:#4A3B66;background:#fff}
 .cc-band{font-size:.72rem;font-weight:800;letter-spacing:.18em;color:rgba(43,35,64,.55)}
 .cc-title{font-size:1.42rem;font-weight:800;letter-spacing:-0.02em}
 .cc-nick{font-size:.85rem;color:rgba(43,35,64,.6);font-weight:600}
+.cc-explain{font-size:.7rem;color:rgba(43,35,64,.48);line-height:1.75;font-weight:600}
 .cc-copy{font-size:.92rem;line-height:1.65;color:rgba(43,35,64,.85);word-break:keep-all}
 .cc-temp{font-size:.8rem;font-weight:800;padding:6px 14px;border-radius:999px;background:rgba(43,35,64,.07)}
 .cc-foot{font-size:.68rem;color:rgba(43,35,64,.45);margin-top:6px;font-weight:600}
@@ -178,6 +179,7 @@ details.deep[open] summary::after{transform:rotate(180deg)}
 .chip-now{background:#FFFFFF}
 .chip-gap{border:1.5px dashed rgba(43,35,64,.28);background:transparent}
 .chip-shadow{background:transparent;color:rgba(43,35,64,.55);font-size:.79rem;padding:2px 4px}
+.chip-sub{display:block;margin-top:5px;font-size:.74rem;color:rgba(43,35,64,.5);font-weight:600}
 .life-save{margin-top:10px;text-align:right}
 .life-save .btn{padding:9px 16px;font-size:.8rem}
 .teaser-card{opacity:.6;text-align:center;padding:16px;border:1.5px dashed #D9C8EE;border-radius:22px;color:#9887B8;font-weight:700;font-size:.88rem}
@@ -186,6 +188,8 @@ details.deep[open] summary::after{transform:rotate(180deg)}
 .compat-card .cp-heart{font-size:1.5rem}
 .compat-card .cp-temp{text-align:center;font-size:1.5rem;font-weight:800;margin:4px 0}
 .compat-card p{font-size:.88rem;line-height:1.65;text-align:center;word-break:keep-all}
+.compat-card .cp-label{font-size:.72rem;font-weight:800;letter-spacing:.06em;color:rgba(43,35,64,.5);text-align:center;margin:14px 0 4px;padding-top:12px;border-top:1px dashed rgba(43,35,64,.15)}
+.compat-card .cp-flip{font-size:.72rem;color:rgba(43,35,64,.45);margin-top:10px}
 .foot-disclaimer{font-size:.72rem;color:#B3A6CC;line-height:1.9;text-align:center;padding:10px 6px 0}
 .foot-disclaimer b{color:#9887B8}
 #toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:#fff;color:#2B2340;font-size:.85rem;font-weight:700;padding:12px 22px;border-radius:999px;opacity:0;pointer-events:none;transition:all .3s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.35);white-space:nowrap}
@@ -313,9 +317,9 @@ details.deep[open] summary::after{transform:rotate(180deg)}
 </div>
 
 <div id="save-overlay" onclick="this.classList.remove('show')">
-  <p>이미지를 길게 눌러 저장하세요 📌</p>
+  <p style="font-size:1.05rem">👆 이미지를 <b style="color:#FFC97E">꾹~ 눌러서</b> 저장하세요</p>
   <img id="save-img" alt="결과 카드">
-  <p style="font-size:.78rem;color:#A99BD1">화면을 탭하면 닫힙니다</p>
+  <p style="font-size:.78rem;color:#C9BFE3">카톡·인스타 안에서는 이 방법으로 저장돼요 · 바깥을 탭하면 닫힘</p>
 </div>
 <div id="toast"></div>
 
@@ -440,6 +444,29 @@ const STEMS = [
   { name: "계수", obj: "이슬비", mod: "이슬비의", kw: "감수성 · 침투", decide: "티 안 나게 스며들어 어느새 판을 적셔버리는 결정",
     desc: "소리 없이 만물을 적시는 이슬비의 결. 여리게 보여도 가장 깊이 스며듭니다." }
 ];
+// 월지(태어난 달의 지지)별 에너지 결 — 비교표 '에너지' 행 전용 (12종)
+const SEASON_ENERGY = [
+  "한겨울 자월생 — 에너지를 깊이 아껴두었다가 꼭 필요한 곳에만 조용히 쓰는 결이에요",
+  "늦겨울 축월생 — 봄을 기다리는 땅처럼, 준비가 끝날 때까지 힘을 안으로 다지는 결이에요",
+  "초봄 인월생 — 언 땅을 뚫는 새싹처럼, 시작할 때 가장 큰 에너지가 나오는 결이에요",
+  "봄 한가운데 묘월생 — 자라나는 것 옆에 있을 때 에너지가 차오르는 결이에요",
+  "늦봄 진월생 — 여러 기운이 섞인 환절기의 땅처럼, 판을 벌여놓고 굴릴 때 힘이 나는 결이에요",
+  "초여름 사월생 — 해가 길어지기 시작하는 때처럼, 달아오르면 멈추기 어려운 결이에요",
+  "한여름 오월생 — 정오의 태양처럼 에너지를 한 번에 크게 태우고 크게 쉬는 결이에요",
+  "늦여름 미월생 — 뜨거움이 익어가는 때라, 꾸준한 온기로 오래 가는 결이에요",
+  "초가을 신월생 — 거둘 것을 고르는 계절처럼, 에너지를 선별해서 쓰는 결이에요",
+  "가을 한가운데 유월생 — 잘 벼려진 낫처럼, 정확한 한 번에 에너지를 모으는 결이에요",
+  "늦가을 술월생 — 수확이 끝난 들판처럼, 지킬 것을 지키는 데 힘을 쓰는 결이에요",
+  "초겨울 해월생 — 겨울로 들어가는 큰 물처럼, 겉은 고요해도 안에서 깊게 흐르는 결이에요"
+];
+// 부족(최소) 오행별 스트레스 반응 — 비교표 '스트레스' 행 전용 (5종)
+const LACK_STRESS = [
+  "판에 목(木)이 옅어서, 지치면 '시작할 힘'부터 마릅니다 — 새 일을 벌이기가 유독 무거워져요",
+  "판에 화(火)가 옅어서, 지치면 표정과 텐션부터 꺼집니다 — 식은 게 아니라 연료를 아끼는 중이에요",
+  "판에 토(土)가 옅어서, 지치면 중심이 흔들리는 느낌부터 옵니다 — 루틴이 최고의 안전장치예요",
+  "판에 금(金)이 옅어서, 지치면 맺고 끊기가 안 됩니다 — 거절 못 해 생긴 피로가 쌓이는 타입이에요",
+  "판에 수(水)가 옅어서, 지치면 머리부터 과열됩니다 — 쉬어도 생각이 안 멈추는 편이에요"
+];
 const ELEM_STRESS = [
   "스트레스가 쌓이면 '더 해내야 한다'며 자신을 몰아붙이는 쪽으로 기웁니다 (목의 과성장)",
   "스트레스가 쌓이면 확 타올랐다가 재처럼 급식는 사이클을 탑니다 (화의 점멸)",
@@ -490,10 +517,17 @@ const FUNC_SIBSIN = { Ne: [1], Se: [1, 2], Ni: [4], Si: [4], Te: [3, 2], Fe: [3]
 
 // 갭 3구간
 const BANDS = [
-  { k: "통합형", label: "타고난 결대로 사는 중", copy: "태어난 코드와 지금의 당신이 거의 같은 방향을 보고 있어요. 원판 그대로, 순정 그대로.", pos: 12 },
-  { k: "반가면형", label: "반쯤만 가면을 쓰는 중", copy: "원판은 그대로 두고, 세상에 나갈 때만 가면을 살짝 걸치는 타입. 벗는 법을 아는 가면은 무기예요.", pos: 50 },
-  { k: "후천개조형", label: "원판을 꽤 두껍게 덮어쓴 중", copy: "당신은 태어난 나를 꽤 두껍게 덮어썼습니다. 그건 그만큼 치열하게 적응해왔다는 훈장이기도 해요.", pos: 86 }
+  { k: "통합형", label: "타고난 결대로 사는 중", explain: "타고난 판 그대로 사는 사람", copy: "태어난 코드와 지금의 당신이 거의 같은 방향을 보고 있어요. 원판 그대로, 순정 그대로.", pos: 12 },
+  { k: "반가면형", label: "반쯤만 가면을 쓰는 중", explain: "필요할 때만 가면을 꺼내 쓰는 사람", copy: "원판은 그대로 두고, 세상에 나갈 때만 가면을 살짝 걸치는 타입. 벗는 법을 아는 가면은 무기예요.", pos: 50 },
+  { k: "후천개조형", label: "원판을 꽤 두껍게 덮어쓴 중", explain: "타고난 판을 크게 고쳐 쓴 사람", copy: "당신은 태어난 나를 꽤 두껍게 덮어썼습니다. 그건 그만큼 치열하게 적응해왔다는 훈장이기도 해요.", pos: 86 }
 ];
+// 칭호 뒷부분(주기능 별호) 1줄 해설 — 캡처 카드 전용
+const NOUN_EXPLAIN = {
+  Ni: "결말의 그림부터 그리는 사람", Ne: "가능성을 사방으로 틔우는 사람",
+  Si: "겪은 것을 기준으로 삼는 사람", Se: "지금 이 순간에 강한 사람",
+  Ti: "이치가 맞아야 움직이는 사람", Te: "판을 짜서 끌고 가는 사람",
+  Fi: "내 기준으로 진짜를 가리는 사람", Fe: "곁의 온도를 지키는 사람"
+};
 
 // 오늘의 한마디 풀
 const TODAY_POOL = [
@@ -558,6 +592,59 @@ const LIFE = {
       부분: "타고난 회로 위에 배운 전략을 반쯤 얹어 쓰는 중 — 편한 사람 앞에서만 원판이 나와요.",
       역전: "타고난 회로와 정반대 방식으로 사랑하는 중 — 그 노력만큼 상대는 몰라주기 쉬워요."
     }
+  }
+};
+
+// 생활 리포트 개인화 ①: 일간 10종 수식절 (타고난 패턴 앞에 붙는 콤마절) — 캡처 카드 물상 어휘 재사용
+const STEM_LIFE = [
+  { m: "큰 나무답게 스케일부터 보는 결이라,", l: "곧은 나무답게 애정도 정면으로 자라는 결이라," },
+  { m: "덩굴답게 틈새 기회를 잘 감아쥐는 결이라,", l: "덩굴답게 스며들 듯 가까워지는 결이라," },
+  { m: "태양답게 쓸 때는 화끈한 결이라,", l: "태양답게 좋아하면 온 동네가 아는 결이라," },
+  { m: "촛불답게 아끼는 곳에만 화력을 모으는 결이라,", l: "촛불답게 한 사람만 오래 비추는 결이라," },
+  { m: "산답게 쉽게 움직이지 않는 결이라,", l: "산답게 한결같음이 무기인 결이라," },
+  { m: "밭답게 심고 기다릴 줄 아는 결이라,", l: "밭답게 품어서 기르는 사랑의 결이라," },
+  { m: "무쇠답게 맺고 끊음이 확실한 결이라,", l: "무쇠답게 돌려 말하지 못하는 결이라," },
+  { m: "보석답게 안목이 깐깐한 결이라,", l: "보석답게 세심한 디테일에 마음이 움직이는 결이라," },
+  { m: "바다답게 크게 들어오고 크게 나가는 결이라,", l: "바다답게 품이 넓고 깊은 결이라," },
+  { m: "이슬비답게 조용히 스며드는 결이라,", l: "이슬비답게 은근하게 오래 적시는 결이라," }
+];
+// 생활 리포트 개인화 ②: '지금의 전략'을 주기능×보조기능 페어 16종으로 (16유형이 3덩어리로 뭉개지는 문제 해소)
+const PAIR_STRATEGY = {
+  money: {
+    NiTe: "머릿속 장기 로드맵에 맞으면 크게 지르고, 아니면 거들떠도 안 보는 편",
+    NiFe: "미래 그림에 사람이 들어 있으면 지갑이 열리는 편 — 선물·모임 지출에 관대해요",
+    NeTi: "'이거 되겠는데?' 싶은 실험에 돈을 태우고, 논리로 사후 정당화하는 편",
+    NeFi: "꽂힌 취향에는 아낌없고 나머지엔 무념무상 — 지출 내역이 곧 애정의 지도인 편",
+    SiTe: "가계부·비교 검증을 거친 뒤에야 결제하는 돌다리 소비인 편",
+    SiFe: "가족·주변 챙기는 데 먼저 쓰고, 정작 내 것은 늘 쓰던 것만 사는 편",
+    SeTi: "현장에서 가성비를 즉석 계산해 바로 결정하는 편 — 망설임이 짧아요",
+    SeFi: "그 순간의 기분과 취향이 시키는 대로 — 후회는 짧고 만족은 긴 편",
+    TiNe: "지출 시스템을 궁리하는 건 좋아하는데 정작 실행은 들쑥날쑥한 편",
+    TiSe: "필요한 것만 정확히 사는 미니멀 — 대신 장비·도구엔 한 방이 있는 편",
+    TeNi: "목표 금액과 기한을 정해 두고 그 안에서 과감하게 굴리는 편",
+    TeSi: "예산표·자동이체로 시스템화 — 계획 밖 지출에 유독 스트레스받는 편",
+    FiNe: "나다움에 맞으면 무리해서라도 사고, 아니면 공짜여도 안 받는 편",
+    FiSe: "심장이 뛰는 그 물건 앞에서만 과감해지는 저격형 소비인 편",
+    FeNi: "관계의 미래를 위한 지출(경조사·모임·선물)이 1순위로 잡히는 편",
+    FeSi: "챙겨야 할 사람 목록대로 꼬박꼬박 — 정작 자기 것엔 인색한 편"
+  },
+  love: {
+    NiTe: "관계의 미래가 그려져야 시작하는 편 — 대신 시작하면 방향이 안 흔들려요",
+    NiFe: "상대의 마음속 결말까지 미리 읽고 조용히 맞춰 주는 편",
+    NeTi: "밀당도 궁금해서 해보는 탐구형 — 결국 대화가 통해야 오래 가는 편",
+    NeFi: "설렘의 가능성을 한껏 키우다가, 진심이 확인되면 올인하는 편",
+    SiTe: "연락 주기·기념일을 성실하게 지키는 신뢰 적립형인 편",
+    SiFe: "함께한 기억을 오래 간직하고, 그 루틴을 지키는 데서 안정을 얻는 편",
+    SeTi: "지금 눈앞의 상대에게 집중 — 재고 따지기보다 부딪혀 보는 편",
+    SeFi: "표현이 몸에 밴 이벤트형 — 지금 이 순간의 온도가 제일 중요한 편",
+    TiNe: "마음을 확신할 때까지 관찰·검증 — 표현은 느리지만 근거는 확실한 편",
+    TiSe: "말보다 행동으로 챙기는 편 — 고쳐 주고 데려다주는 게 고백이에요",
+    TeNi: "관계에도 로드맵이 있는 편 — 애매한 사이를 오래 못 견뎌요",
+    TeSi: "챙길 것을 리스트로 관리하는 든든함 — 대신 서프라이즈엔 약한 편",
+    FiNe: "깊고 느리게 확신을 쌓다가, 한번 정하면 세상 유일한 사랑을 하는 편",
+    FiSe: "확신이 서면 그 순간부터 직진 — 표현은 서툴러도 진심은 묵직한 편",
+    FeNi: "상대의 기분 변화를 먼저 읽고 관계의 온도를 조율하는 편",
+    FeSi: "밥은 먹었는지부터 챙기는 생활 밀착형 — 곁을 지키는 게 사랑인 편"
   }
 };
 
@@ -731,10 +818,13 @@ const Engine = {
     const ei = r.input.mbti[0];
     const judging = r.stack.find(f2 => "TeTiFeFi".includes(f2));
     const domF = FUNCS[r.stack[0]], infF = FUNCS[r.stack[3]];
+    // 행별 근거 분리(디벨롭 감사 합의): 에너지=월지 계절 / 결정=일간 / 스트레스=부족(최소) 오행
+    let lackElem = r.elemCount.indexOf(0);
+    if (lackElem < 0) lackElem = r.elemCount.indexOf(Math.min(...r.elemCount));
     return [
-      { axis: "에너지", saju: dom.energy, mbti: ei === "E" ? `바깥 세계와 접속할 때 충전됩니다 — 주기능 '${domF.nick}'(${r.stack[0]})${josa(domF.nick, "이/가").slice(domF.nick.length)} 밖을 향해요` : `안의 세계로 돌아올 때 충전됩니다 — 주기능 '${domF.nick}'(${r.stack[0]})${josa(domF.nick, "이/가").slice(domF.nick.length)} 안을 향해요` },
+      { axis: "에너지", saju: SEASON_ENERGY[r.p.month.branch], mbti: ei === "E" ? `바깥 세계와 접속할 때 충전됩니다 — 주기능 '${domF.nick}'(${r.stack[0]})${josa(domF.nick, "이/가").slice(domF.nick.length)} 밖을 향해요` : `안의 세계로 돌아올 때 충전됩니다 — 주기능 '${domF.nick}'(${r.stack[0]})${josa(domF.nick, "이/가").slice(domF.nick.length)} 안을 향해요` },
       { axis: "결정", saju: STEMS[r.dayStem].decide, mbti: `'${FUNCS[judging].nick}'(${FUNCS[judging].name}·${judging})의 문법 — ${FUNCS[judging].os.split(".")[0]}.` },
-      { axis: "스트레스", saju: ELEM_STRESS[r.dayElem], mbti: `숨겨둔 '${infF.nick}'(열등기능 ${r.stack[3]}) 발동 — ${infF.grip}` }
+      { axis: "스트레스", saju: LACK_STRESS[lackElem], mbti: `숨겨둔 '${infF.nick}'(열등기능 ${r.stack[3]}) 발동 — ${infF.grip}` }
     ];
   },
   today(r) {
@@ -760,11 +850,30 @@ const Engine = {
     else if ((eB + 1) % 5 === eA) { temp = 90; lines.push(`${josa(ELEMS[eB].k, "이/가")} ${josa(ELEMS[eA].k, "을/를")} 낳는 <b>상생</b> — ${josa(STEMS[sB].name, "이/가")} ${josa(STEMS[sA].name, "을/를")} 자라게 하는 조합.`); }
     else { temp = 75; lines.push(`${josa(ELEMS[eA].k, "과/와")} ${josa(ELEMS[eB].k, "은/는")} <b>상극</b> — 하지만 명리에서 극(克)은 서로를 조각해 완성하는 관계이기도 합니다.`); }
     if ((a.p.day.branch + b.p.day.branch) % 12 === 1) { temp = Math.min(99, temp + 4); lines.push(`일지가 <b>지지육합(六合)</b>! 일상 리듬이 자석처럼 맞물리는 보너스가 붙었어요.`); }
-    const shared = STACKS[a.input.mbti].slice(0, 2).filter(f => STACKS[b.input.mbti].slice(0, 2).includes(f)).length;
-    lines.push(shared >= 1 ? `MBTI 상위 인지기능도 ${shared}개 겹칩니다 — 세상을 처리하는 언어가 비슷해요.` : `MBTI 인지기능은 서로 다른 언어 — 번역이 필요하지만, 그래서 서로에게 새로운 세계입니다.`);
-    return { temp, lines };
+    // 타고난 합: 상호 십신 — 오행 거리 d(0~4)로 방향이 결정되는 비대칭 서사
+    const born = MUTUAL_SIBSIN[sibsinOf(eA, eB)].replace(/\{B\}/g, b.input.nick + "님").replace(/\{A\}/g, "당신");
+    // 살아남은 합: 주기능 같음/충돌/보완 + E·I 충전 조합
+    const fa = STACKS[a.input.mbti][0], fb = STACKS[b.input.mbti][0];
+    const na = FUNCS[fa].nick, nb = FUNCS[fb].nick;
+    let funcLine;
+    if (fa === fb) funcLine = `두 사람 다 주기능이 '${na}'(${fa}) — 세상을 처리하는 기본 OS가 같아서, 굳이 설명 안 해도 통하는 사이예요.`;
+    else if (fa[0] === fb[0]) funcLine = `'${na}'(${fa})와 '${nb}'(${fb}) — 같은 언어를 반대 방향으로 쓰는 조합이라 같은 주제로 다른 결론을 내요. 번역만 되면 최강의 팀.`;
+    else funcLine = `'${na}'(${fa})와 '${nb}'(${fb}) — 서로에게 없는 렌즈를 하나씩 가진 보완 조합. 상대의 시선이 내 사각지대를 비춰 줘요.`;
+    const eiKey = a.input.mbti[0] + b.input.mbti[0];
+    const eiLine = eiKey === "EE" ? "둘 다 바깥에서 충전하는 E — 같이 나가면 시너지, 대신 쉼표는 각자." :
+      eiKey === "II" ? "둘 다 안에서 충전하는 I — 같이 있어도 각자 조용한 시간이 필요한 사이예요." :
+      "충전 방식이 반대(E×I)라 한 명이 나가자 할 때 한 명은 눕고 싶어요 — 서로의 페이스 존중이 열쇠.";
+    return { temp, lines, born, now: [funcLine, eiLine] };
   }
 };
+// 상호 십신 5가지 구도 (오행 거리 d 기준, {A}='당신' {B}='○○님' 고정 — 둘 다 받침으로 끝나 조사 확정형 사용)
+const MUTUAL_SIBSIN = [
+  "두 사람은 서로에게 '자기 축'(비겁) — 거울을 보는 관계예요. 말이 통하는 만큼, 같은 자리를 두고 은근히 경쟁하게 되는 날도 있어요.",
+  "{B}은 {A}이 아낌없이 쏟게 되는 존재(표현·식상), {A}은 {B}을 채워 주는 존재(수용·인성)예요. 에너지가 {A}에게서 {B} 쪽으로 흐르는 게 기본값이라, 가끔은 받는 연습도 필요해요.",
+  "{B}은 {A}이 손에 넣고 싶어지는 존재(현실 운용·재성), {A}은 {B}에게 기준이 되는 존재(규범·관성)예요. {A}이 리드하는 그림이 자연스러운 조합.",
+  "{B}은 {A}을 다잡아 주는 존재(규범·관성), {A}은 {B}이 아끼고 싶어지는 존재(현실 운용·재성)예요. {B}의 잔소리는 견제가 아니라 책임감이에요.",
+  "{B}은 {A}을 채워 주는 존재(수용·인성), {A}은 {B}이 아낌없이 쏟는 존재(표현·식상)예요. 받기만 하는 것 같아 미안해질 때가 있지만, 그게 이 관계의 순방향이에요."
+];
 
 /* ---------- 7. 앱 컨트롤러 ---------- */
 const HOURS = ["자시 (23:00~00:59)", "축시 (01:00~02:59)", "인시 (03:00~04:59)", "묘시 (05:00~06:59)", "진시 (07:00~08:59)", "사시 (09:00~10:59)", "오시 (11:00~12:59)", "미시 (13:00~14:59)", "신시 (15:00~16:59)", "유시 (17:00~18:59)", "술시 (19:00~20:59)", "해시 (21:00~22:59)"];
@@ -779,6 +888,9 @@ const MT_QUESTIONS = [
   { f: "Fe", q: "어느 자리에 가든 그 공간의 분위기와 사람들 기분을 자동으로 살핀다." }
 ];
 const DOM_AUX_TYPE = { NiTe: "INTJ", NiFe: "INFJ", NeTi: "ENTP", NeFi: "ENFP", SiTe: "ISTJ", SiFe: "ISFJ", SeTi: "ESTP", SeFi: "ESFP", TiNe: "INTP", TiSe: "ISTP", TeNi: "ENTJ", TeSi: "ESTJ", FiNe: "INFP", FiSe: "ISFP", FeNi: "ENFJ", FeSi: "ESFJ" };
+// 인앱 브라우저(카톡·인스타·페북·라인 등)는 a[download]·clipboard가 무시되는 경우가 많음
+const IS_INAPP = /KAKAOTALK|Instagram|FBAN|FBAV|FB_IAB|Line\/|NAVER\(inapp|DaumApps|everytimeApp|whale.*inapp/i.test(navigator.userAgent);
+const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
 
 const App = {
   state: { cal: "sol", mbti: null, est: false, step: 1, vsCode: null },
@@ -956,8 +1068,16 @@ const App = {
   renderLifeCard(r, item) {
     const cfg = LIFE[item];
     const s = Engine.lifeStyle(r, item);
-    const sj = cfg.saju[s.saju], mb = cfg.mbti[s.mbti];
+    const sj = cfg.saju[s.saju];
     const ei = r.input.mbti[0];
+    // 개인화: 일간 수식절 + 주×보조기능 페어 16종 (스택 3구간 폴백)
+    const innate = `${STEM_LIFE[r.dayStem][item === "money" ? "m" : "l"]} ${sj.light}`;
+    const strategy = (PAIR_STRATEGY[item] || {})[r.stack[0] + r.stack[1]] || cfg.mbti[s.mbti];
+    // 십신 2위가 바짝 붙어 있으면(차이 1 이하) 보조 기운 표시
+    const others = cfg.order.filter(i => i !== s.saju);
+    const second = others.sort((a, b) => r.sibCount[b] - r.sibCount[a])[0];
+    const subChip = (r.sibCount[second] > 0 && r.sibCount[s.saju] - r.sibCount[second] <= 1)
+      ? `<span class="chip-sub">＋ '${cfg.saju[second].label}' 기운도 바짝 붙어 있어요</span>` : "";
     // 러브 카드는 기존 '숨겨진 모드'와 연결 (신규 예측 문구 0)
     const gapExtra = item === "love" ? " 지쳤을 땐 아래 '숨겨진 모드'가 연애에서 가장 먼저 나오는 편이에요." : "";
     return `<div class="card life-card" id="life-${item}" style="background:${cfg.bg}">
@@ -966,8 +1086,8 @@ const App = {
       <div class="life-body">
         <div class="life-char">${CharSVG.mini(r.dayStem, ei, 88)}<span class="life-emoji">${sj.icon}</span></div>
         <div class="life-chips">
-          <div class="chip chip-innate"><span class="cl">🌱 타고난 패턴 — ${sj.label}</span>${sj.light}</div>
-          <div class="chip chip-now"><span class="cl">🎭 지금의 전략</span>${mb}</div>
+          <div class="chip chip-innate"><span class="cl">🌱 타고난 패턴 — ${sj.label}</span>${innate}${subChip}</div>
+          <div class="chip chip-now"><span class="cl">🎭 지금의 전략 (${r.input.mbti})</span>${strategy}</div>
         </div>
       </div>
       <div class="life-chips" style="margin-top:8px">
@@ -1016,6 +1136,11 @@ const App = {
           <div class="cp-chars">${CharSVG.mini(r.dayStem, ei, 82)}<span class="cp-heart">💘</span>${CharSVG.mini(other.dayStem, other.input.mbti[0], 82, true)}</div>
           <div class="cp-temp" style="color:${elem.dark}">궁합 온도 ${cp.temp}°</div>
           ${cp.lines.map(l => `<p>${l}</p>`).join("")}
+          <div class="cp-label">🌱 타고난 합 — 서로가 서로에게 어떤 존재인지</div>
+          <p>${cp.born}</p>
+          <div class="cp-label">🎭 살아남은 합 — 지금의 두 사람</div>
+          ${cp.now.map(l => `<p>${l}</p>`).join("")}
+          <p class="cp-flip">↔ 링크를 서로 바꿔 열면 '타고난 합'의 방향이 뒤집혀 보여요</p>
         </div>`;
       } catch (e) { /* 무시 */ }
     }
@@ -1033,6 +1158,7 @@ const App = {
           <div class="cc-band" style="color:${elem.dark}">${band.k} · ${band.label}</div>
           <div class="cc-title">${stem.name} ${r.input.mbti}</div>
           <div class="cc-nick">${r.input.nick} — ${r.nickname}${r.input.est ? " (MBTI 간이추정)" : ""}</div>
+          <div class="cc-explain">${band.k} = ${band.explain}<br>${FUNCS[r.stack[0]].noun} = ${NOUN_EXPLAIN[r.stack[0]]}</div>
           <p class="cc-copy">${stem.desc}</p>
           <div class="cc-temp" style="color:${elem.dark}">타고난 나 ↔ 살아남은 나 · 온도차 약 ${r.temp}°</div>
           <div class="cc-foot">#원판찾기 #${stem.name} #${r.input.mbti}</div>
@@ -1144,10 +1270,38 @@ const App = {
     const url = location.origin + location.pathname + "#r=" + this.encode(this._r.input);
     const text = `🪐 나의 원판: ${this._r.title} — ${this._r.nickname}\n지금의 성격, 원래 내 걸까? 너도 확인해봐!`;
     if (navigator.share) {
-      navigator.share({ title: "원판 찾기", text, url }).catch(() => {});
+      navigator.share({ title: "원판 찾기", text, url }).catch(err => {
+        if (err && err.name !== "AbortError") this.copyText(text + "\n" + url);
+      });
     } else {
-      navigator.clipboard.writeText(text + "\n" + url).then(() => this.toast("링크를 복사했어요! 친구에게 붙여넣기 📋"));
+      this.copyText(text + "\n" + url);
     }
+  },
+  // 클립보드 3단 폴백: clipboard API → execCommand → prompt (카톡·인스타 인앱 브라우저 대응)
+  copyText(t) {
+    const done = () => this.toast("칭호와 링크를 복사했어요! 친구에게 붙여넣기 📋");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).then(done).catch(() => this.copyLegacy(t) ? done() : this.copyPrompt(t));
+    } else {
+      this.copyLegacy(t) ? done() : this.copyPrompt(t);
+    }
+  },
+  copyLegacy(t) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = t;
+      ta.style.cssText = "position:fixed;top:-999px;opacity:0";
+      ta.setAttribute("readonly", "");
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, t.length);
+      const ok = document.execCommand("copy");
+      ta.remove();
+      return ok;
+    } catch (e) { return false; }
+  },
+  copyPrompt(t) {
+    window.prompt("아래 내용을 길게 눌러 복사해주세요 📋", t);
   },
 
   toast(msg) {
@@ -1188,13 +1342,15 @@ const App = {
       <g transform="translate(${W / 2 - 240},${cy + 160}) scale(2)">${charSvg}</g>
       <text x="${W / 2}" y="${cy + 760}" font-family="${fontStack}" font-size="32" font-weight="800" letter-spacing="5" fill="${elem.dark}" text-anchor="middle" opacity=".75">${band.k} · ${band.label}</text>
       <text x="${W / 2}" y="${cy + 845}" font-family="${fontStack}" font-size="68" font-weight="800" fill="#2B2340" text-anchor="middle">${stem.name} ${r.input.mbti}</text>
-      <text x="${W / 2}" y="${cy + 905}" font-family="${fontStack}" font-size="36" font-weight="700" fill="#2B2340" opacity=".6" text-anchor="middle">${r.input.nick} — ${r.nickname}</text>
-      <text x="${W / 2}" y="${cy + 985}" font-family="${fontStack}" font-size="34" fill="#2B2340" opacity=".85" text-anchor="middle">${stem.desc.split(". ")[0]}.</text>
-      <text x="${W / 2}" y="${cy + 1035}" font-family="${fontStack}" font-size="34" fill="#2B2340" opacity=".85" text-anchor="middle">${stem.desc.split(". ").slice(1).join(" ")}</text>
-      <rect x="${W / 2 - 260}" y="${cy + 1085}" width="520" height="66" rx="33" fill="#2B2340" opacity=".07"/>
-      <text x="${W / 2}" y="${cy + 1129}" font-family="${fontStack}" font-size="30" font-weight="800" fill="${elem.dark}" text-anchor="middle">타고난 나 ↔ 살아남은 나 · 온도차 약 ${r.temp}°</text>
-      <text x="${W / 2}" y="${cy + 1240}" font-family="${fontStack}" font-size="28" font-weight="700" fill="#2B2340" opacity=".45" text-anchor="middle">#원판찾기 #${stem.name} #${r.input.mbti}</text>
-      <text x="${W / 2}" y="${cy + 1290}" font-family="${fontStack}" font-size="26" font-weight="600" fill="#2B2340" opacity=".35" text-anchor="middle">${location.host || "wonpan"}</text>
+      <text x="${W / 2}" y="${cy + 903}" font-family="${fontStack}" font-size="36" font-weight="700" fill="#2B2340" opacity=".6" text-anchor="middle">${r.input.nick} — ${r.nickname}</text>
+      <text x="${W / 2}" y="${cy + 950}" font-family="${fontStack}" font-size="25" font-weight="600" fill="#2B2340" opacity=".48" text-anchor="middle">${band.k} = ${band.explain}</text>
+      <text x="${W / 2}" y="${cy + 988}" font-family="${fontStack}" font-size="25" font-weight="600" fill="#2B2340" opacity=".48" text-anchor="middle">${FUNCS[r.stack[0]].noun} = ${NOUN_EXPLAIN[r.stack[0]]}</text>
+      <text x="${W / 2}" y="${cy + 1046}" font-family="${fontStack}" font-size="34" fill="#2B2340" opacity=".85" text-anchor="middle">${stem.desc.split(". ")[0]}.</text>
+      <text x="${W / 2}" y="${cy + 1094}" font-family="${fontStack}" font-size="34" fill="#2B2340" opacity=".85" text-anchor="middle">${stem.desc.split(". ").slice(1).join(" ")}</text>
+      <rect x="${W / 2 - 260}" y="${cy + 1128}" width="520" height="62" rx="31" fill="#2B2340" opacity=".07"/>
+      <text x="${W / 2}" y="${cy + 1170}" font-family="${fontStack}" font-size="30" font-weight="800" fill="${elem.dark}" text-anchor="middle">타고난 나 ↔ 살아남은 나 · 온도차 약 ${r.temp}°</text>
+      <text x="${W / 2}" y="${cy + 1252}" font-family="${fontStack}" font-size="28" font-weight="700" fill="#2B2340" opacity=".45" text-anchor="middle">#원판찾기 #${stem.name} #${r.input.mbti}</text>
+      <text x="${W / 2}" y="${cy + 1298}" font-family="${fontStack}" font-size="26" font-weight="600" fill="#2B2340" opacity=".35" text-anchor="middle">${location.host || "wonpan"}</text>
     </svg>`;
     const img = new Image();
     const blobUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
@@ -1204,7 +1360,8 @@ const App = {
       canvas.getContext("2d").drawImage(img, 0, 0);
       URL.revokeObjectURL(blobUrl);
       canvas.toBlob(blob => {
-        if (!blob) { this.saveFallback(canvas); return; }
+        // 인앱 브라우저는 a[download]가 무시되므로 즉시 '꾹 눌러 저장' 오버레이로
+        if (!blob || IS_INAPP) { this.saveFallback(canvas); return; }
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = `원판찾기_${r.title.replace(/\s/g, "_")}_${mode}.png`;
@@ -1213,7 +1370,7 @@ const App = {
         a.remove();
         this.toast("카드를 저장했어요! 📸");
         // iOS 사파리 등 다운로드 미지원 대비 오버레이도 제공
-        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) this.saveFallback(canvas);
+        if (IS_IOS) this.saveFallback(canvas);
       }, "image/png");
     };
     img.onerror = () => { URL.revokeObjectURL(blobUrl); this.toast("이미지 생성에 실패했어요 😢 스크린샷을 이용해주세요"); };
@@ -1237,15 +1394,17 @@ const App = {
   },
   saveLifeCard(item) {
     const r = this._r, cfg = LIFE[item], s = Engine.lifeStyle(r, item);
-    const sj = cfg.saju[s.saju], mb = cfg.mbti[s.mbti];
+    const sj = cfg.saju[s.saju];
+    const innate = `${STEM_LIFE[r.dayStem][item === "money" ? "m" : "l"]} ${sj.light}`;
+    const mb = (PAIR_STRATEGY[item] || {})[r.stack[0] + r.stack[1]] || cfg.mbti[s.mbti];
     const gapExtra = item === "love" ? " 지쳤을 땐 '숨겨진 모드'가 연애에서 가장 먼저 나오는 편." : "";
     const W = 1080, H = 1350;
     const fontStack = `-apple-system,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif`;
     const char = CharSVG.mini(r.dayStem, r.input.mbti[0], 88)
       .replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "").replace(/var\(--blush,0\.55\)/g, "0.55");
     const blocks = [
-      { label: `🌱 타고난 패턴 — ${sj.label}`, text: sj.light, chip: "rgba(255,255,255,.72)" },
-      { label: "🎭 지금의 전략", text: mb, chip: "#FFFFFF" },
+      { label: `🌱 타고난 패턴 — ${sj.label}`, text: innate, chip: "rgba(255,255,255,.72)" },
+      { label: `🎭 지금의 전략 (${r.input.mbti})`, text: mb, chip: "#FFFFFF" },
       { label: `🌡️ 온도차 — ${s.gap}`, text: cfg.gapCopy[s.gap] + gapExtra, chip: "none" },
       { label: "🌘 지쳤을 때는", text: sj.shadow, chip: "none" }
     ];
@@ -1279,13 +1438,13 @@ const App = {
       canvas.getContext("2d").drawImage(img, 0, 0);
       URL.revokeObjectURL(blobUrl);
       canvas.toBlob(blob => {
-        if (!blob) { this.saveFallback(canvas); return; }
+        if (!blob || IS_INAPP) { this.saveFallback(canvas); return; }
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = `원판찾기_${cfg.title.replace(/\s/g, "_")}_${r.input.nick}.png`;
         document.body.appendChild(a); a.click(); a.remove();
         this.toast("카드를 저장했어요! 📸");
-        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) this.saveFallback(canvas);
+        if (IS_IOS) this.saveFallback(canvas);
       }, "image/png");
     };
     img.onerror = () => { URL.revokeObjectURL(blobUrl); this.toast("이미지 생성에 실패했어요 😢 스크린샷을 이용해주세요"); };
@@ -1311,6 +1470,11 @@ App.init();
   // 음력: 2025.1.1(음) = 2025-01-29(양)
   eq("음력 설날 2025", Calc.lunarToSolar(2025, 1, 1, false), { d: 29, m: 1, y: 2025 });
   eq("윤6월 2025 존재", Calc.lLeapMonth(2025), 6);
+  // 회귀: 같은 일주·다른 생월이면 비교표 '에너지' 행이 달라야 함 (dead data 재배선 검증)
+  const ra = Engine.analyze({ y: 1990, m: 3, d: 1, hourIdx: -1, mbti: "INFP", nick: "a", est: 0, lun: 0 });
+  const rb = Engine.analyze({ y: 1990, m: 4, d: 30, hourIdx: -1, mbti: "INFP", nick: "b", est: 0, lun: 0 });
+  eq("60일 간격 같은 일주", [ra.dayStem, ra.p.day.branch], [rb.dayStem, rb.p.day.branch]);
+  t.push(["같은 일주·다른 생월 → 에너지 행 상이", Engine.vsRows(ra)[0].saju !== Engine.vsRows(rb)[0].saju, Engine.vsRows(ra)[0].saju.slice(0, 12), "≠"]);
   // 생활 리포트: 18셀(사주 3 × MBTI 3 × 2항목) 전수 — 갭 테이블 누락/빈 문구 검출
   let lifeCells = 0;
   for (const item of ["money", "love"]) {
@@ -1321,7 +1485,13 @@ App.init();
       t.push(["생활리포트 " + item + " " + sk + "_" + mk, !!ok, ok, true]);
       lifeCells++;
     }
+    // 개인화 페어 16종 전수 + 일간 수식절 10종 전수
+    for (const type of Object.keys(STACKS)) {
+      const key = STACKS[type][0] + STACKS[type][1];
+      t.push(["페어 " + item + " " + key, !!PAIR_STRATEGY[item][key], !!PAIR_STRATEGY[item][key], true]);
+    }
   }
+  for (let i = 0; i < 10; i++) t.push(["일간 수식절 " + STEM_NAMES[i], !!(STEM_LIFE[i].m && STEM_LIFE[i].l), true, true]);
   const fails = t.filter(x => !x[1]);
   console.log(`[원판 찾기 self-test] ${t.length - fails.length}/${t.length} 통과`);
   fails.forEach(f => console.warn("FAIL:", f[0], "got", f[2], "want", f[3]));
