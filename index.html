@@ -167,6 +167,21 @@ details.deep[open] summary::after{transform:rotate(180deg)}
 .share-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .share-grid .btn{padding:14px 0;font-size:.92rem}
 .share-grid .wide{grid-column:1/-1}
+.life-sub{font-size:.78rem;color:rgba(43,35,64,.55);margin:-6px 0 12px;font-weight:600}
+.life-body{display:flex;gap:14px;align-items:flex-start}
+.life-char{position:relative;flex:0 0 88px}
+.life-emoji{position:absolute;right:-4px;bottom:0;font-size:1.5rem;filter:drop-shadow(0 2px 3px rgba(0,0,0,.15))}
+.life-chips{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.chip{border-radius:12px;padding:9px 12px;font-size:.84rem;line-height:1.55;word-break:keep-all;color:rgba(43,35,64,.88)}
+.chip .cl{font-size:.68rem;font-weight:800;letter-spacing:.06em;display:block;margin-bottom:3px;color:rgba(43,35,64,.5)}
+.chip-innate{background:rgba(255,255,255,.72)}
+.chip-now{background:#FFFFFF}
+.chip-gap{border:1.5px dashed rgba(43,35,64,.28);background:transparent}
+.chip-shadow{background:transparent;color:rgba(43,35,64,.55);font-size:.79rem;padding:2px 4px}
+.life-save{margin-top:10px;text-align:right}
+.life-save .btn{padding:9px 16px;font-size:.8rem}
+.teaser-card{opacity:.6;text-align:center;padding:16px;border:1.5px dashed #D9C8EE;border-radius:22px;color:#9887B8;font-weight:700;font-size:.88rem}
+.life-note{font-size:.72rem;color:#B3A6CC;text-align:center;margin-top:-8px}
 .compat-card .cp-chars{display:flex;justify-content:center;align-items:center;gap:6px;margin:6px 0}
 .compat-card .cp-heart{font-size:1.5rem}
 .compat-card .cp-temp{text-align:center;font-size:1.5rem;font-weight:800;margin:4px 0}
@@ -437,9 +452,9 @@ const ELEM_STRESS = [
 const SIBSIN = [
   { k: "비겁", name: "자기 축", desc: "내 기준으로 서 있는 힘", energy: "밖의 평가보다 내 축을 지키는 데 에너지를 씁니다" },
   { k: "식상", name: "표현", desc: "안의 것을 밖으로 꺼내는 힘", energy: "느끼고 만든 것을 밖으로 꺼내는 데 에너지를 씁니다" },
-  { k: "재성", name: "현실 운용", desc: "손에 잡히는 것을 다루는 힘", energy: "눈앞의 현실과 자원을 굴리는 데 에너지를 씁니다" },
-  { k: "관성", name: "규범", desc: "틀과 책임을 지는 힘", energy: "질서를 세우고 책임을 감당하는 데 에너지를 씁니다" },
-  { k: "인성", name: "수용", desc: "받아들이고 소화하는 힘", energy: "배우고 소화해서 안에 쌓는 데 에너지를 씁니다" }
+  { k: "재성", name: "현실 운용", desc: "돈과 실리를 굴리는 힘", energy: "눈앞의 현실과 자원을 굴리는 데 에너지를 씁니다" },
+  { k: "관성", name: "규범", desc: "나를 다잡고 인정받게 하는 힘", energy: "질서를 세우고 책임을 감당하는 데 에너지를 씁니다" },
+  { k: "인성", name: "수용", desc: "배우고 흡수해서 나를 채우는 힘", energy: "배우고 소화해서 안에 쌓는 데 에너지를 씁니다" }
 ];
 // 일간 대비 오행 관계 → 십신 그룹 인덱스
 function sibsinOf(dayElem, elem) { return (elem - dayElem + 5) % 5; } // 0비겁 1식상 2재성 3관성 4인성
@@ -476,7 +491,7 @@ const FUNC_SIBSIN = { Ne: [1], Se: [1, 2], Ni: [4], Si: [4], Te: [3, 2], Fe: [3]
 // 갭 3구간
 const BANDS = [
   { k: "통합형", label: "타고난 결대로 사는 중", copy: "태어난 코드와 지금의 당신이 거의 같은 방향을 보고 있어요. 원판 그대로, 순정 그대로.", pos: 12 },
-  { k: "반가면형", label: "필요한 만큼만 가면을 쓰는 중", copy: "원판은 그대로 두고, 세상에 나갈 때만 가면을 살짝 걸치는 타입. 벗는 법을 아는 가면은 무기예요.", pos: 50 },
+  { k: "반가면형", label: "반쯤만 가면을 쓰는 중", copy: "원판은 그대로 두고, 세상에 나갈 때만 가면을 살짝 걸치는 타입. 벗는 법을 아는 가면은 무기예요.", pos: 50 },
   { k: "후천개조형", label: "원판을 꽤 두껍게 덮어쓴 중", copy: "당신은 태어난 나를 꽤 두껍게 덮어썼습니다. 그건 그만큼 치열하게 적응해왔다는 훈장이기도 해요.", pos: 86 }
 ];
 
@@ -498,6 +513,53 @@ const TODAY_POOL = [
   "오늘의 운세: 대체로 맑음, 한때 열등기능.",
   "남의 원판을 부러워하는 순간 내 원판의 장점이 로그아웃합니다."
 ];
+
+/* ---------- 4.5 원판 생활 리포트 (돈·사랑 스타일 — 예측 아닌 구조 해석) ---------- */
+// 5인 토론 합의: '운' 어휘 금지, 십신 argmax × 기능 스택 위치만 사용, 3×3 갭은 명시적 룩업 테이블
+const LIFE = {
+  money: {
+    emoji: "💰", title: "돈 앞에서의 나", sub: "타고난 소비 본능 × 지금의 관리 전략",
+    bg: "linear-gradient(160deg,#FFF8E8,#FFEFC2)", dark: "#A87F3E", bgs: ["#FFF8E8", "#FFEFC2"],
+    order: [2, 1, 0], // 재성 > 식상 > 비겁 (동률 우선순위)
+    axes: ["Te", "Se"], fallback: "가치",
+    saju: {
+      2: { label: "손에 잡히는 것부터", icon: "💎", light: "눈앞의 기회와 실물을 빠르게 알아보는 감각을 타고났어요.", shadow: "눈앞 이익이 크면 세워둔 계획이 잠깐 흔들리는 날도 있는 편." },
+      1: { label: "벌 궁리가 먼저", icon: "🛠️", light: "뭔가를 만들고 굴려서 버는 구조를 타고났어요.", shadow: "벌기도 전에 쓸 곳부터 정해두는 편." },
+      0: { label: "내 몫은 내 손에", icon: "✊", light: "내 돈은 내가 굴려야 직성이 풀리는 자기 주도형이에요.", shadow: "정작 사람에게는 돈이 술술 새는 편." }
+    },
+    mbti: {
+      Te: "숫자로 적어두고 시스템으로 관리하는 편", Se: "눈에 보일 때 바로 결정하는 즉시 보상형인 편",
+      가치: "'이건 나다움에 투자'처럼 내 기준에 맞으면 지갑이 열리는 편"
+    },
+    gap: { "2_Te": "일치", "2_Se": "일치", "2_가치": "역전", "1_Se": "일치", "1_Te": "부분", "1_가치": "부분", "0_가치": "일치", "0_Te": "역전", "0_Se": "부분" },
+    gapCopy: {
+      일치: "타고난 감각과 지금의 전략이 같은 방향 — 돈 앞에서 덜 흔들리는 조합이에요.",
+      부분: "타고난 감각 위에 다른 전략을 반쯤 얹어 쓰는 중 — 상황 따라 스위치가 바뀌어요.",
+      역전: "타고난 감각과 정반대 전략으로 사는 중 — 그만큼 치열하게 배워온 흔적이에요."
+    }
+  },
+  love: {
+    emoji: "💘", title: "사랑할 때의 나", sub: "타고난 애정 회로 × 살아남은 연애 전략",
+    bg: "linear-gradient(160deg,#FFF0F5,#FFDCE9)", dark: "#C7527E", bgs: ["#FFF0F5", "#FFDCE9"],
+    order: [3, 1, 4], // 관성 > 식상 > 인성
+    axes: ["Fe", "Fi"], fallback: "관찰",
+    saju: {
+      3: { label: "기준이 있는 사랑", icon: "🛡️", light: "신뢰와 책임이 느껴지는 사람에게 마음이 움직여요.", shadow: "그 기준이 어느 순간 상대 검열로 변하는 편." },
+      1: { label: "표현이 곧 마음", icon: "🎉", light: "말과 장난, 챙김으로 마음을 증명하는 타입이에요.", shadow: "리액션이 없으면 마음이 빨리 시드는 편." },
+      4: { label: "받아야 차오르는", icon: "🫧", light: "이해받는 느낌이 들 때 마음이 차오르는 타입이에요.", shadow: "말 안 하고 기다리다 서운함을 적립하는 편." }
+    },
+    mbti: {
+      Fe: "상대 기분을 먼저 읽고 맞춰서 표현하는 편", Fi: "깊고 느리게, 확신이 서야 움직이는 편",
+      관찰: "좋아하는 게 맞는지 스스로 검증부터 하는 편"
+    },
+    gap: { "3_Fe": "일치", "3_Fi": "역전", "3_관찰": "부분", "1_Fe": "일치", "1_Fi": "부분", "1_관찰": "역전", "4_Fe": "부분", "4_Fi": "일치", "4_관찰": "부분" },
+    gapCopy: {
+      일치: "타고난 회로와 지금의 연애 방식이 같은 방향 — 꾸미지 않아도 자연스러운 조합이에요.",
+      부분: "타고난 회로 위에 배운 전략을 반쯤 얹어 쓰는 중 — 편한 사람 앞에서만 원판이 나와요.",
+      역전: "타고난 회로와 정반대 방식으로 사랑하는 중 — 그 노력만큼 상대는 몰라주기 쉬워요."
+    }
+  }
+};
 
 /* ---------- 5. SVG 캐릭터 엔진 (베이스 10 × 소품 8 × 표정 2) ---------- */
 const CharSVG = {
@@ -679,6 +741,15 @@ const Engine = {
     const t = new Date();
     const seed = t.getFullYear() * 10000 + (t.getMonth() + 1) * 100 + t.getDate();
     return TODAY_POOL[(seed + r.dayStem * 7 + MBTI_LIST.indexOf(r.input.mbti) * 3) % TODAY_POOL.length];
+  },
+  // 생활 리포트 판정: 십신 argmax(우선순위 tie-break) × 기능 스택 상위(0~1번) 조회
+  lifeStyle(r, item) {
+    const cfg = LIFE[item];
+    let best = cfg.order[0];
+    for (const i of cfg.order) if (r.sibCount[i] > r.sibCount[best]) best = i;
+    const i1 = r.stack.indexOf(cfg.axes[0]), i2 = r.stack.indexOf(cfg.axes[1]);
+    const mk = (i1 >= 0 && i1 <= 1) ? cfg.axes[0] : (i2 >= 0 && i2 <= 1) ? cfg.axes[1] : cfg.fallback;
+    return { saju: best, mbti: mk, gap: cfg.gap[best + "_" + mk] };
   },
   compat(a, b) {
     const sA = a.dayStem, sB = b.dayStem, eA = STEM_ELEM[sA], eB = STEM_ELEM[sB];
@@ -881,6 +952,32 @@ const App = {
     return btoa(unescape(encodeURIComponent(JSON.stringify(input)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   },
 
+  /* ---------- 생활 리포트 카드 렌더 ---------- */
+  renderLifeCard(r, item) {
+    const cfg = LIFE[item];
+    const s = Engine.lifeStyle(r, item);
+    const sj = cfg.saju[s.saju], mb = cfg.mbti[s.mbti];
+    const ei = r.input.mbti[0];
+    // 러브 카드는 기존 '숨겨진 모드'와 연결 (신규 예측 문구 0)
+    const gapExtra = item === "love" ? " 지쳤을 땐 아래 '숨겨진 모드'가 연애에서 가장 먼저 나오는 편이에요." : "";
+    return `<div class="card life-card" id="life-${item}" style="background:${cfg.bg}">
+      <h3>${cfg.emoji} ${cfg.title}</h3>
+      <p class="life-sub">${cfg.sub}</p>
+      <div class="life-body">
+        <div class="life-char">${CharSVG.mini(r.dayStem, ei, 88)}<span class="life-emoji">${sj.icon}</span></div>
+        <div class="life-chips">
+          <div class="chip chip-innate"><span class="cl">🌱 타고난 패턴 — ${sj.label}</span>${sj.light}</div>
+          <div class="chip chip-now"><span class="cl">🎭 지금의 전략</span>${mb}</div>
+        </div>
+      </div>
+      <div class="life-chips" style="margin-top:8px">
+        <div class="chip chip-gap"><span class="cl">🌡️ 온도차 — ${s.gap}</span>${cfg.gapCopy[s.gap]}${gapExtra}</div>
+        <div class="chip chip-shadow">🌘 지쳤을 때는: ${sj.shadow}</div>
+      </div>
+      <div class="life-save"><button class="btn btn-ghost" onclick="App.saveLifeCard('${item}')">📷 이 카드만 저장</button></div>
+    </div>`;
+  },
+
   /* ---------- 결과 렌더 ---------- */
   showResult(r, opts = {}) {
     this._r = r;
@@ -962,6 +1059,12 @@ const App = {
           ${rows.map(row => `<tr><td class="axis">${row.axis}</td><td>${row.saju}</td><td>${row.mbti}</td></tr>`).join("")}
         </table>
       </div>
+
+      <div style="text-align:center;font-size:.8rem;font-weight:800;letter-spacing:.2em;color:#9887B8;margin:6px 0 -6px">🧾 원 판 생 활 리 포 트</div>
+      ${this.renderLifeCard(r, "money")}
+      ${this.renderLifeCard(r, "love")}
+      <div class="teaser-card">🔥 일할 때의 나 — 다음 업데이트에서 만나요</div>
+      <p class="life-note">타고난 구조의 해석이며, 시기나 결과의 예측이 아닙니다.</p>
 
       <div class="card">
         <h3>🌘 숨겨진 모드 — 지쳤을 때의 당신</h3>
@@ -1119,6 +1222,74 @@ const App = {
   saveFallback(canvas) {
     document.getElementById("save-img").src = canvas.toDataURL("image/png");
     document.getElementById("save-overlay").classList.add("show");
+  },
+
+  /* ---------- 생활 리포트 카드 저장 ---------- */
+  wrapText(t, n) {
+    const out = [];
+    let cur = "";
+    for (const w of t.split(" ")) {
+      if ((cur + " " + w).trim().length > n && cur) { out.push(cur.trim()); cur = w; }
+      else cur = (cur + " " + w).trim();
+    }
+    if (cur) out.push(cur);
+    return out;
+  },
+  saveLifeCard(item) {
+    const r = this._r, cfg = LIFE[item], s = Engine.lifeStyle(r, item);
+    const sj = cfg.saju[s.saju], mb = cfg.mbti[s.mbti];
+    const gapExtra = item === "love" ? " 지쳤을 땐 '숨겨진 모드'가 연애에서 가장 먼저 나오는 편." : "";
+    const W = 1080, H = 1350;
+    const fontStack = `-apple-system,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif`;
+    const char = CharSVG.mini(r.dayStem, r.input.mbti[0], 88)
+      .replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "").replace(/var\(--blush,0\.55\)/g, "0.55");
+    const blocks = [
+      { label: `🌱 타고난 패턴 — ${sj.label}`, text: sj.light, chip: "rgba(255,255,255,.72)" },
+      { label: "🎭 지금의 전략", text: mb, chip: "#FFFFFF" },
+      { label: `🌡️ 온도차 — ${s.gap}`, text: cfg.gapCopy[s.gap] + gapExtra, chip: "none" },
+      { label: "🌘 지쳤을 때는", text: sj.shadow, chip: "none" }
+    ];
+    let y = 600, body = "";
+    for (const b of blocks) {
+      const lines = this.wrapText(b.text, 26);
+      const blockH = 56 + lines.length * 46 + 20;
+      if (b.chip !== "none") body += `<rect x="90" y="${y - 14}" width="${W - 180}" height="${blockH - 4}" rx="20" fill="${b.chip}"/>`;
+      else body += `<rect x="90" y="${y - 14}" width="${W - 180}" height="${blockH - 4}" rx="20" fill="none" stroke="rgba(43,35,64,.25)" stroke-width="2.5" stroke-dasharray="8 7"/>`;
+      body += `<text x="120" y="${y + 26}" font-family="${fontStack}" font-size="27" font-weight="800" fill="${cfg.dark}">${b.label}</text>`;
+      lines.forEach((ln, i) => body += `<text x="120" y="${y + 76 + i * 46}" font-family="${fontStack}" font-size="32" fill="#3A3050">${ln}</text>`);
+      y += blockH + 22;
+    }
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+      <defs><linearGradient id="lbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${cfg.bgs[0]}"/><stop offset="1" stop-color="${cfg.bgs[1]}"/></linearGradient></defs>
+      <rect width="${W}" height="${H}" fill="url(#lbg)"/>
+      <text x="110" y="100" font-family="${fontStack}" font-size="32" font-weight="800" letter-spacing="5" fill="${cfg.dark}">🧾 원판 생활 리포트</text>
+      <text x="${W - 110}" y="100" font-family="${fontStack}" font-size="28" font-weight="700" fill="${cfg.dark}" opacity=".6" text-anchor="end">${r.input.nick}</text>
+      <text x="${W / 2}" y="200" font-family="${fontStack}" font-size="58" font-weight="800" fill="#2B2340" text-anchor="middle">${cfg.emoji} ${cfg.title}</text>
+      <text x="${W / 2}" y="252" font-family="${fontStack}" font-size="29" font-weight="600" fill="#2B2340" opacity=".55" text-anchor="middle">${cfg.sub} · ${STEMS[r.dayStem].name} ${r.input.mbti}</text>
+      <g transform="translate(${W / 2 - 144},288) scale(1.2)">${char}</g>
+      <text x="${W / 2 + 160}" y="520" font-family="${fontStack}" font-size="76" text-anchor="middle">${sj.icon}</text>
+      ${body}
+      <text x="${W / 2}" y="${H - 44}" font-family="${fontStack}" font-size="24" font-weight="600" fill="#2B2340" opacity=".38" text-anchor="middle">시기·결과 예측이 아닌 타고난 구조의 해석 · ${location.host || "wonpan"}</text>
+    </svg>`;
+    const img = new Image();
+    const blobUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = W; canvas.height = H;
+      canvas.getContext("2d").drawImage(img, 0, 0);
+      URL.revokeObjectURL(blobUrl);
+      canvas.toBlob(blob => {
+        if (!blob) { this.saveFallback(canvas); return; }
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `원판찾기_${cfg.title.replace(/\s/g, "_")}_${r.input.nick}.png`;
+        document.body.appendChild(a); a.click(); a.remove();
+        this.toast("카드를 저장했어요! 📸");
+        if (/iPhone|iPad|iPod/.test(navigator.userAgent)) this.saveFallback(canvas);
+      }, "image/png");
+    };
+    img.onerror = () => { URL.revokeObjectURL(blobUrl); this.toast("이미지 생성에 실패했어요 😢 스크린샷을 이용해주세요"); };
+    img.src = blobUrl;
   }
 };
 
@@ -1140,6 +1311,17 @@ App.init();
   // 음력: 2025.1.1(음) = 2025-01-29(양)
   eq("음력 설날 2025", Calc.lunarToSolar(2025, 1, 1, false), { d: 29, m: 1, y: 2025 });
   eq("윤6월 2025 존재", Calc.lLeapMonth(2025), 6);
+  // 생활 리포트: 18셀(사주 3 × MBTI 3 × 2항목) 전수 — 갭 테이블 누락/빈 문구 검출
+  let lifeCells = 0;
+  for (const item of ["money", "love"]) {
+    const cfg = LIFE[item];
+    for (const sk of cfg.order) for (const mk of [...cfg.axes, cfg.fallback]) {
+      const g = cfg.gap[sk + "_" + mk];
+      const ok = g && cfg.gapCopy[g] && cfg.saju[sk].light && cfg.saju[sk].shadow && cfg.mbti[mk];
+      t.push(["생활리포트 " + item + " " + sk + "_" + mk, !!ok, ok, true]);
+      lifeCells++;
+    }
+  }
   const fails = t.filter(x => !x[1]);
   console.log(`[원판 찾기 self-test] ${t.length - fails.length}/${t.length} 통과`);
   fails.forEach(f => console.warn("FAIL:", f[0], "got", f[2], "want", f[3]));
