@@ -537,14 +537,14 @@ const TODAY_POOL = [
   "오늘의 피로는 성격 탓이 아니라 그냥 수면 부족일 확률 90%.",
   "타고난 결을 거스르는 일은 오후로 미루세요. 오전의 당신은 원판입니다.",
   "누군가의 첫인상 평가는 당신의 패치노트만 읽은 겁니다. 원본 코드는 못 봤어요.",
-  "오늘은 열등기능이 튀어나오기 좋은 날씨. 커피를 줄이세요.",
+  "오늘은 당신의 '{SHADOW}' 그림자가 깨어나기 좋은 날씨. 커피를 줄이세요.",
   "적응하느라 애쓴 당신, 오늘은 애쓰지 않는 것도 능력입니다.",
   "원판과 패치가 싸우면, 오늘은 원판 편을 들어주세요.",
   "지금 미루고 있는 그 일, 당신 기질에는 원래 안 맞는 게 정상입니다.",
   "오늘 마주칠 무례함은 당신의 원판을 시험하러 온 NPC입니다.",
   "쉬는 것도 계획이 필요한 당신이라면, 지금 이 문장이 그 계획입니다.",
   "당신이 덮어쓴 버전도, 원판도, 둘 다 정품입니다.",
-  "오늘의 운세: 대체로 맑음, 한때 열등기능.",
+  "오늘의 운세: 대체로 맑음, 한때 그림자 모드.",
   "남의 원판을 부러워하는 순간 내 원판의 장점이 로그아웃합니다."
 ];
 
@@ -824,13 +824,15 @@ const Engine = {
     return [
       { axis: "에너지", saju: SEASON_ENERGY[r.p.month.branch], mbti: ei === "E" ? `바깥 세계와 접속할 때 충전됩니다 — 주기능 '${domF.nick}'(${r.stack[0]})${josa(domF.nick, "이/가").slice(domF.nick.length)} 밖을 향해요` : `안의 세계로 돌아올 때 충전됩니다 — 주기능 '${domF.nick}'(${r.stack[0]})${josa(domF.nick, "이/가").slice(domF.nick.length)} 안을 향해요` },
       { axis: "결정", saju: STEMS[r.dayStem].decide, mbti: `'${FUNCS[judging].nick}'(${FUNCS[judging].name}·${judging})의 문법 — ${FUNCS[judging].os.split(".")[0]}.` },
-      { axis: "스트레스", saju: LACK_STRESS[lackElem], mbti: `숨겨둔 '${infF.nick}'(열등기능 ${r.stack[3]}) 발동 — ${infF.grip}` }
+      { axis: "스트레스", saju: LACK_STRESS[lackElem], mbti: `숨겨둔 '${infF.nick}'(${infF.name}·${r.stack[3]}) 발동 — ${infF.grip}` }
     ];
   },
   today(r) {
     const t = new Date();
     const seed = t.getFullYear() * 10000 + (t.getMonth() + 1) * 100 + t.getDate();
-    return TODAY_POOL[(seed + r.dayStem * 7 + MBTI_LIST.indexOf(r.input.mbti) * 3) % TODAY_POOL.length];
+    const msg = TODAY_POOL[(seed + r.dayStem * 7 + MBTI_LIST.indexOf(r.input.mbti) * 3) % TODAY_POOL.length];
+    // 전문 용어 개인화: {SHADOW} → 본인 열등기능 별명 (시드는 공용, 별명만 개인화)
+    return msg.replace(/\{SHADOW\}/g, (r && r.stack) ? FUNCS[r.stack[3]].nick : "숨겨진 모드");
   },
   // 생활 리포트 판정: 십신 argmax(우선순위 tie-break) × 기능 스택 상위(0~1번) 조회
   lifeStyle(r, item) {
@@ -1492,6 +1494,9 @@ App.init();
     }
   }
   for (let i = 0; i < 10; i++) t.push(["일간 수식절 " + STEM_NAMES[i], !!(STEM_LIFE[i].m && STEM_LIFE[i].l), true, true]);
+  // 재발 방지(용어 자문 합의): 공용 문구 풀에 전문 원어 단독 노출 금지 — 발견 시 테스트 실패
+  const JARGON = /열등기능|주기능|부기능|3차기능|인지기능|십신|비겁|식상|재성|관성|인성(?!\))|\b(Ni|Ne|Si|Se|Ti|Te|Fi|Fe)\b/;
+  TODAY_POOL.forEach((msg, i) => t.push(["공용 문구 금칙어 #" + i, !JARGON.test(msg), msg.slice(0, 20), "clean"]));
   const fails = t.filter(x => !x[1]);
   console.log(`[원판 찾기 self-test] ${t.length - fails.length}/${t.length} 통과`);
   fails.forEach(f => console.warn("FAIL:", f[0], "got", f[2], "want", f[3]));
