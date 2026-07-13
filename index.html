@@ -90,6 +90,7 @@ select option{color:#4A3B66;background:#fff}
 .btn-next:active{transform:translateY(3px);box-shadow:0 2px 0 #F58FB0}
 .btn-next:disabled{opacity:.35;cursor:not-allowed}
 .err{font-size:.82rem;color:#E85C7B;min-height:1.2em}
+.hint{font-size:.78rem;color:#9887B8;margin-top:8px;line-height:1.6;word-break:keep-all}
 
 /* mini test */
 #minitest{position:fixed;inset:0;z-index:50;background:rgba(74,59,102,.35);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
@@ -239,6 +240,7 @@ details.deep[open] summary::after{transform:rotate(180deg)}
       <div class="leap-row" id="leap-row" style="margin-top:10px">
         <input type="checkbox" id="leap-chk"><label for="leap-chk" style="margin:0">윤달에 태어났어요</label>
       </div>
+      <p class="hint">잘 모르면 그냥 양력! (주민등록상 생일이 보통 양력이에요)</p>
     </div>
     <div class="field">
       <label>생년월일</label>
@@ -249,8 +251,9 @@ details.deep[open] summary::after{transform:rotate(180deg)}
       </div>
     </div>
     <div class="field">
-      <label>태어난 시간 <span style="color:#8B80A8;font-weight:400">(사주처럼 2시간 단위)</span></label>
+      <label>태어난 시간 <span style="color:#B3A6CC;font-weight:400">(사주처럼 2시간 단위)</span></label>
       <select id="sel-h"></select>
+      <p class="hint">⏰ 몰라도 괜찮아요! '몰라요'를 고르면 시간 빼고도 충분히 나와요 🙂</p>
     </div>
     <p class="err" id="err1"></p>
     <div class="nav-row">
@@ -266,6 +269,7 @@ details.deep[open] summary::after{transform:rotate(180deg)}
     </div>
     <div class="mbti-grid" id="mbti-grid"></div>
     <button class="mbti-unknown" id="mbti-unknown" onclick="App.openMiniTest()">🤔 모름 — 30초 간이 추정하기</button>
+    <p class="hint">가물가물하면 제일 자주 나왔던 걸로! '다시 테스트'로 언제든 바꿔볼 수 있어요</p>
     <p class="err" id="err2"></p>
     <div class="nav-row">
       <button class="btn btn-back" onclick="App.showStep(1)">이전</button>
@@ -467,6 +471,9 @@ const LACK_STRESS = [
   "판에 금(金)이 옅어서, 지치면 맺고 끊기가 안 됩니다 — 거절 못 해 생긴 피로가 쌓이는 타입이에요",
   "판에 수(水)가 옅어서, 지치면 머리부터 과열됩니다 — 쉬어도 생각이 안 멈추는 편이에요"
 ];
+// 일간명 3초 해설 (초심자 토론 합의): 캡처 이미지에도 남는 정적 표기 — 이모지 + 물상 별명
+const STEM_EMOJI = ["🌳", "🌿", "☀️", "🕯️", "⛰️", "🌾", "⚒️", "💎", "🌊", "💧"];
+const STEM_SHORT = ["큰나무", "덩굴", "태양", "촛불", "산", "밭", "무쇠", "보석", "바다", "이슬비"];
 const ELEM_STRESS = [
   "스트레스가 쌓이면 '더 해내야 한다'며 자신을 몰아붙이는 쪽으로 기웁니다 (목의 과성장)",
   "스트레스가 쌓이면 확 타올랐다가 재처럼 급식는 사이클을 탑니다 (화의 점멸)",
@@ -878,7 +885,8 @@ const MUTUAL_SIBSIN = [
 ];
 
 /* ---------- 7. 앱 컨트롤러 ---------- */
-const HOURS = ["자시 (23:00~00:59)", "축시 (01:00~02:59)", "인시 (03:00~04:59)", "묘시 (05:00~06:59)", "진시 (07:00~08:59)", "사시 (09:00~10:59)", "오시 (11:00~12:59)", "미시 (13:00~14:59)", "신시 (15:00~16:59)", "유시 (17:00~18:59)", "술시 (19:00~20:59)", "해시 (21:00~22:59)"];
+// 생활 시간을 주표기로, 지지명은 괄호 부기 (초심자 토론 합의)
+const HOURS = ["밤 11시 ~ 새벽 1시 (자시)", "새벽 1시 ~ 3시 (축시)", "새벽 3시 ~ 5시 (인시)", "새벽 5시 ~ 아침 7시 (묘시)", "아침 7시 ~ 9시 (진시)", "오전 9시 ~ 11시 (사시)", "오전 11시 ~ 오후 1시 (오시)", "오후 1시 ~ 3시 (미시)", "오후 3시 ~ 5시 (신시)", "오후 5시 ~ 저녁 7시 (유시)", "저녁 7시 ~ 9시 (술시)", "밤 9시 ~ 11시 (해시)"];
 const MT_QUESTIONS = [
   { f: "Ni", q: "처음 보는 문제도 '결국 이렇게 될 것 같다'는 그림이 먼저 떠오른다." },
   { f: "Ne", q: "하나의 이야기에서 곁가지 아이디어가 계속 뻗어나가 수습이 안 된다." },
@@ -923,7 +931,7 @@ const App = {
     sm.innerHTML = o;
     this.fillDays();
     sy.onchange = sm.onchange = () => this.fillDays();
-    o = `<option value="-1">모름 (시주 없이 계산)</option>`;
+    o = `<option value="-1">🤷 몰라요 — 시간 빼고 볼게요</option>`;
     HOURS.forEach((h, i) => o += `<option value="${i}">${h}</option>`);
     sh.innerHTML = o;
     // MBTI 그리드
@@ -1035,11 +1043,15 @@ const App = {
       const input = { y, m, d, hourIdx: +document.getElementById("sel-h").value, mbti: this.state.mbti, nick, est: this.state.est ? 1 : 0, lun: lun ? 1 : 0 };
       try { localStorage.setItem("wonpan_last", JSON.stringify(input)); } catch (e) { /* 스토리지 차단 환경에서도 진행 */ }
       const result = Engine.analyze(input);
-      // 로딩 연출
+      // 로딩 연출 — 첫 방문자에게는 이 틈에 핵심 프레임 온보딩 (스크롤·첫 화면 무게 0)
       this.go("loading");
-      const msgs = ["만세력 펼치는 중…", "입춘 경계 확인 중…", "살아남은 당신과 대조 중…"];
+      let onboarded = false;
+      try { onboarded = !!localStorage.getItem("wonpan_onboarded"); localStorage.setItem("wonpan_onboarded", "1"); } catch (e) { /* 무시 */ }
+      const msgs = onboarded
+        ? ["만세력 펼치는 중…", "입춘 경계 확인 중…", "살아남은 당신과 대조 중…"]
+        : ["사주 = 태어난 순간 받은 기본 세팅(원판) 🌱", "MBTI = 세상에 부대끼며 지금의 내가 고른 답 🎭", "지금부터 이 둘의 간격을 잽니다…"];
       const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const stepMs = reduced ? 0 : 900;
+      const stepMs = reduced ? 0 : (onboarded ? 900 : 1150);
       const el = document.getElementById("loadmsg");
       msgs.forEach((msg, i) => setTimeout(() => el.textContent = msg, stepMs * i));
       setTimeout(() => {
@@ -1158,7 +1170,7 @@ const App = {
           <div class="cc-top"><span>🪐 원판 찾기</span><span>${dateStr}</span></div>
           <div class="cc-charwrap"><div class="cc-halo"></div>${CharSVG.render(r.dayStem, r.stack[0], ei, { shadowStem: r.dayStem, uid: "main" })}</div>
           <div class="cc-band" style="color:${elem.dark}">${band.k} · ${band.label}</div>
-          <div class="cc-title">${stem.name} ${r.input.mbti}</div>
+          <div class="cc-title">${STEM_EMOJI[r.dayStem]} ${stem.name}(${STEM_SHORT[r.dayStem]}) ${r.input.mbti}</div>
           <div class="cc-nick">${r.input.nick} — ${r.nickname}${r.input.est ? " (MBTI 간이추정)" : ""}</div>
           <div class="cc-explain">${band.k} = ${band.explain}<br>${FUNCS[r.stack[0]].noun} = ${NOUN_EXPLAIN[r.stack[0]]}</div>
           <p class="cc-copy">${stem.desc}</p>
@@ -1343,7 +1355,7 @@ const App = {
       <circle cx="${W / 2}" cy="${cy + 400}" r="290" fill="url(#halo)"/>
       <g transform="translate(${W / 2 - 240},${cy + 160}) scale(2)">${charSvg}</g>
       <text x="${W / 2}" y="${cy + 760}" font-family="${fontStack}" font-size="32" font-weight="800" letter-spacing="5" fill="${elem.dark}" text-anchor="middle" opacity=".75">${band.k} · ${band.label}</text>
-      <text x="${W / 2}" y="${cy + 845}" font-family="${fontStack}" font-size="68" font-weight="800" fill="#2B2340" text-anchor="middle">${stem.name} ${r.input.mbti}</text>
+      <text x="${W / 2}" y="${cy + 845}" font-family="${fontStack}" font-size="62" font-weight="800" fill="#2B2340" text-anchor="middle">${STEM_EMOJI[r.dayStem]} ${stem.name}(${STEM_SHORT[r.dayStem]}) ${r.input.mbti}</text>
       <text x="${W / 2}" y="${cy + 903}" font-family="${fontStack}" font-size="36" font-weight="700" fill="#2B2340" opacity=".6" text-anchor="middle">${r.input.nick} — ${r.nickname}</text>
       <text x="${W / 2}" y="${cy + 950}" font-family="${fontStack}" font-size="25" font-weight="600" fill="#2B2340" opacity=".48" text-anchor="middle">${band.k} = ${band.explain}</text>
       <text x="${W / 2}" y="${cy + 988}" font-family="${fontStack}" font-size="25" font-weight="600" fill="#2B2340" opacity=".48" text-anchor="middle">${FUNCS[r.stack[0]].noun} = ${NOUN_EXPLAIN[r.stack[0]]}</text>
