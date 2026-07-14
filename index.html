@@ -253,7 +253,7 @@ details.deep[open] summary::after{transform:rotate(180deg)}
     <div class="field">
       <label>태어난 시간 <span style="color:#B3A6CC;font-weight:400">(사주처럼 2시간 단위)</span></label>
       <select id="sel-h"></select>
-      <p class="hint">⏰ 몰라도 괜찮아요! '몰라요'를 고르면 시간 빼고도 충분히 나와요 🙂</p>
+      <p class="hint">⏰ 몰라도 괜찮아요! '몰라요'를 고르면 시간 빼고도 충분히 나와요 🙂<br>🕐 한국 표준시 기준 30분 보정된 구간이에요 (주류 만세력과 동일 기준)</p>
     </div>
     <p class="err" id="err1"></p>
     <div class="nav-row">
@@ -384,10 +384,12 @@ const Calc = {
     offset += ld - 1;
     return this.jdnToDate(this.jdn(1900, 1, 31) + offset);
   },
-  // 사주팔자: 년/월/일/시 4주 (hourIdx: 0=자시…11=해시, -1=모름)
+  // 사주팔자: 년/월/일/시 4주 (hourIdx: 0=조자시…11=해시, 12=야자시, -1=모름)
   saju(y, m, d, hourIdx) {
-    // 일주: (JDN+49)%60, 앵커 1900-01-01=갑술(10)·2000-01-01=무오(54) 검증됨
-    const dayIdx = ((this.jdn(y, m, d) + 49) % 60 + 60) % 60;
+    // 야자시(정자시법): 일주·시주만 다음날 기준, 년주·월주는 출생 시점(원래 날짜) 기준 유지
+    const yaja = hourIdx === 12;
+    // 일주: (JDN+49)%60, 앵커 1900-01-01=갑술(10)·1949-10-01=갑자(0) 검증됨
+    const dayIdx = ((this.jdn(y, m, d) + (yaja ? 1 : 0) + 49) % 60 + 60) % 60;
     // 년주: 입춘(3번째 절기)일 기준
     const ipchun = this.term(y, 3);
     const adjY = (m < 2 || (m === 2 && d < ipchun)) ? y - 1 : y;
@@ -399,9 +401,12 @@ const Calc = {
     const yStem = yearIdx % 10;
     const mStem = ((yStem % 5) * 2 + 2 + monthIdx) % 10;   // 오호둔
     const mBranch = (monthIdx + 2) % 12;
-    // 시주: 오서둔 (23시는 당일 자시로 처리)
+    // 시주: 오서둔 (야자시는 지지=자, 천간은 이월된 일간 기준 — 정자시법)
     let hour = null;
-    if (hourIdx >= 0) hour = { stem: ((dayIdx % 10 % 5) * 2 + hourIdx) % 10, branch: hourIdx };
+    if (hourIdx >= 0) {
+      const hb = yaja ? 0 : hourIdx;
+      hour = { stem: ((dayIdx % 10 % 5) * 2 + hb) % 10, branch: hb };
+    }
     return {
       year: { stem: yStem, branch: yearIdx % 12 },
       month: { stem: mStem, branch: mBranch },
@@ -885,8 +890,9 @@ const MUTUAL_SIBSIN = [
 ];
 
 /* ---------- 7. 앱 컨트롤러 ---------- */
-// 생활 시간을 주표기로, 지지명은 괄호 부기 (초심자 토론 합의)
-const HOURS = ["밤 11시 ~ 새벽 1시 (자시)", "새벽 1시 ~ 3시 (축시)", "새벽 3시 ~ 5시 (인시)", "새벽 5시 ~ 아침 7시 (묘시)", "아침 7시 ~ 9시 (진시)", "오전 9시 ~ 11시 (사시)", "오전 11시 ~ 오후 1시 (오시)", "오후 1시 ~ 3시 (미시)", "오후 3시 ~ 5시 (신시)", "오후 5시 ~ 저녁 7시 (유시)", "저녁 7시 ~ 9시 (술시)", "밤 9시 ~ 11시 (해시)"];
+// 생활 시간을 주표기로, 지지명은 괄호 부기. 진태양시 30분 보정 적용(5인 판정: 주류 만세력과 동일 기준)
+// idx 0 = 조자시(당일), idx 12 = 야자시(정자시법 — 다음날 일주로 계산)
+const HOURS = ["새벽 0시 30분 ~ 1시 30분 (조자시)", "새벽 1시 30분 ~ 3시 30분 (축시)", "새벽 3시 30분 ~ 5시 30분 (인시)", "새벽 5시 30분 ~ 아침 7시 30분 (묘시)", "아침 7시 30분 ~ 9시 30분 (진시)", "오전 9시 30분 ~ 11시 30분 (사시)", "오전 11시 30분 ~ 오후 1시 30분 (오시)", "오후 1시 30분 ~ 3시 30분 (미시)", "오후 3시 30분 ~ 5시 30분 (신시)", "오후 5시 30분 ~ 저녁 7시 30분 (유시)", "저녁 7시 30분 ~ 9시 30분 (술시)", "밤 9시 30분 ~ 11시 30분 (해시)", "밤 11시 30분 ~ 새벽 0시 30분 (야자시 — 다음날 기운으로 계산)"];
 const MT_QUESTIONS = [
   { f: "Ni", q: "처음 보는 문제도 '결국 이렇게 될 것 같다'는 그림이 먼저 떠오른다." },
   { f: "Ne", q: "하나의 이야기에서 곁가지 아이디어가 계속 뻗어나가 수습이 안 된다." },
@@ -1040,7 +1046,7 @@ const App = {
         if (!sol) { document.getElementById("err3").textContent = "음력 날짜가 올바르지 않아요. 1단계에서 다시 확인해주세요."; this.showStep(1); return; }
         y = sol.y; m = sol.m; d = sol.d;
       }
-      const input = { y, m, d, hourIdx: +document.getElementById("sel-h").value, mbti: this.state.mbti, nick, est: this.state.est ? 1 : 0, lun: lun ? 1 : 0 };
+      const input = { y, m, d, hourIdx: +document.getElementById("sel-h").value, mbti: this.state.mbti, nick, est: this.state.est ? 1 : 0, lun: lun ? 1 : 0, v: 2 };
       try { localStorage.setItem("wonpan_last", JSON.stringify(input)); } catch (e) { /* 스토리지 차단 환경에서도 진행 */ }
       const result = Engine.analyze(input);
       // 로딩 연출 — 첫 방문자에게는 이 틈에 핵심 프레임 온보딩 (스크롤·첫 화면 무게 0)
@@ -1266,7 +1272,7 @@ const App = {
         본 서비스는 <b>오락·자기이해 목적</b>의 콘텐츠입니다. 사주와 MBTI 해석은 과학적 진단이 아니며,
         채용·연애·투자 등 중요한 결정의 근거로 사용하지 마세요. (인사·연애 결정에 쓰면 심리학자가 웁니다)<br>
         입력 정보는 서버로 전송되지 않고 이 브라우저에만 저장됩니다 · 만세력은 입춘/절기일 기준 계산
-        · 시간은 진태양시(약 ±30분) 미보정${r.input.est ? " · MBTI는 8문항 간이 추정이라 신뢰도가 낮아요" : ""}<br>
+        · 시진은 태양시 30분 보정 적용, 야자시는 정자시법(다음날 일주)${r.input.est ? " · MBTI는 8문항 간이 추정이라 신뢰도가 낮아요" : ""}<br>
         inspired by 운명 패치 🫧
       </p>`;
     this.go("result");
@@ -1484,6 +1490,14 @@ App.init();
   // 음력: 2025.1.1(음) = 2025-01-29(양)
   eq("음력 설날 2025", Calc.lunarToSolar(2025, 1, 1, false), { d: 29, m: 1, y: 2025 });
   eq("윤6월 2025 존재", Calc.lLeapMonth(2025), 6);
+  // 야자시(정자시법) 검증: 문의 케이스 2001-01-06
+  eq("조자시 일주 (2001-01-06)", Calc.saju(2001, 1, 6, 0).day, { stem: 5, branch: 5 });   // 기사일
+  eq("조자시 시주", Calc.saju(2001, 1, 6, 0).hour, { stem: 0, branch: 0 });               // 갑자시
+  eq("야자시 일주 이월", Calc.saju(2001, 1, 6, 12).day, { stem: 6, branch: 6 });           // 경오일(다음날)
+  eq("야자시 시주", Calc.saju(2001, 1, 6, 12).hour, { stem: 2, branch: 0 });               // 병자시(을경일→병자)
+  eq("야자시 년주는 원래 날짜 기준", Calc.saju(2001, 1, 6, 12).year, { stem: 6, branch: 4 }); // 경진년 유지
+  // 연말 롤오버: 2000-12-31 야자시 → 일주 = 2001-01-01 = 갑자일
+  eq("야자시 연말 롤오버", Calc.saju(2000, 12, 31, 12).day, { stem: 0, branch: 0 });
   // 회귀: 같은 일주·다른 생월이면 비교표 '에너지' 행이 달라야 함 (dead data 재배선 검증)
   const ra = Engine.analyze({ y: 1990, m: 3, d: 1, hourIdx: -1, mbti: "INFP", nick: "a", est: 0, lun: 0 });
   const rb = Engine.analyze({ y: 1990, m: 4, d: 30, hourIdx: -1, mbti: "INFP", nick: "b", est: 0, lun: 0 });
