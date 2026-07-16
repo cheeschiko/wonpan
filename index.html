@@ -191,6 +191,25 @@ details.deep[open] summary::after{transform:rotate(180deg)}
 .compat-card p{font-size:.88rem;line-height:1.65;text-align:center;word-break:keep-all}
 .compat-card .cp-label{font-size:.72rem;font-weight:800;letter-spacing:.06em;color:rgba(43,35,64,.5);text-align:center;margin:14px 0 4px;padding-top:12px;border-top:1px dashed rgba(43,35,64,.15)}
 .compat-card .cp-flip{font-size:.72rem;color:rgba(43,35,64,.45);margin-top:10px}
+.cp-badge{text-align:center;margin:2px auto 6px;display:table;background:linear-gradient(90deg,#FF9EBB,#FFC97E);color:#5C3548;font-size:.78rem;font-weight:800;padding:5px 14px;border-radius:999px}
+.cp-gyeol{font-size:.84rem;color:rgba(43,35,64,.7);text-align:center;margin-bottom:6px}
+/* 궁합 온천 */
+.onsen-note{font-size:.8rem;color:rgba(43,35,64,.6);margin:-4px 0 12px;line-height:1.6;word-break:keep-all}
+.onsen-anon{float:right;border:1.5px solid #EADFF5;background:#fff;border-radius:999px;padding:4px 10px;font-size:.7rem;font-weight:700;color:#7A6B98;cursor:pointer;font-family:inherit}
+.onsen-empty{text-align:center;font-size:.85rem;color:rgba(43,35,64,.55);line-height:1.8;padding:18px 6px;word-break:keep-all}
+.tang{border:1.5px solid;border-radius:16px;padding:10px 12px;margin-bottom:10px}
+.tang-head{font-size:.82rem;font-weight:800;margin-bottom:8px}
+.tang-head span{font-size:.68rem;font-weight:600;opacity:.75}
+.tang-chips{display:flex;flex-wrap:wrap;gap:6px}
+.onsen-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.85);border-radius:999px;padding:4px 10px 4px 4px;font-size:.78rem;cursor:pointer;box-shadow:0 2px 6px rgba(43,35,64,.08)}
+.onsen-chip svg{border-radius:50%}
+.onsen-chip b{color:#2B2340;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.onsen-chip em{font-style:normal;color:rgba(43,35,64,.6);font-weight:700;font-size:.72rem}
+.onsen-chip u{text-decoration:none;font-size:.66rem;color:#D6537E;font-weight:800}
+.onsen-chip i{font-style:normal;color:rgba(43,35,64,.35);font-size:.72rem;padding:2px 4px}
+.onsen-chip i:hover{color:#E85C7B}
+.onsen-foot{font-size:.7rem;color:rgba(43,35,64,.45);line-height:1.8;margin-top:6px;word-break:keep-all}
+.onsen-foot a{color:#D6537E;font-weight:700}
 .foot-disclaimer{font-size:.72rem;color:#B3A6CC;line-height:1.9;text-align:center;padding:10px 6px 0}
 .foot-disclaimer b{color:#9887B8}
 #toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:#fff;color:#2B2340;font-size:.85rem;font-weight:700;padding:12px 22px;border-radius:999px;opacity:0;pointer-events:none;transition:all .3s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.35);white-space:nowrap}
@@ -877,9 +896,18 @@ const Engine = {
     const eiLine = eiKey === "EE" ? "둘 다 바깥에서 충전하는 E — 같이 나가면 시너지, 대신 쉼표는 각자." :
       eiKey === "II" ? "둘 다 안에서 충전하는 I — 같이 있어도 각자 조용한 시간이 필요한 사이예요." :
       "충전 방식이 반대(E×I)라 한 명이 나가자 할 때 한 명은 눕고 싶어요 — 서로의 페이스 존중이 열쇠.";
-    return { temp, lines, born, now: [funcLine, eiLine] };
+    // 결(結) 라벨: 오행 거리 d → 관계의 종류 (서열이 아닌 결 — 온천 기록장용)
+    const gyeol = [2, 1, 3, 3, 0][sibsinOf(eA, eB)];
+    return { temp, lines, born, now: [funcLine, eiLine], gyeol };
   }
 };
+// 결 4종: 우열 없는 관계의 종류 (순기능 부연 고정 부착 — MBTI 감수)
+const GYEOL = [
+  { e: "🌳", name: "기대는 결", desc: "한쪽이 채워 주고 한쪽이 기대는, 서로의 쉼터가 되는 사이" },
+  { e: "🔥", name: "지피는 결", desc: "만나면 뭐라도 벌이게 되는, 서로를 지피는 사이" },
+  { e: "🪨", name: "나란한 결", desc: "말 안 해도 통하는, 어깨를 나란히 걷는 사이" },
+  { e: "🌊", name: "휘몰아치는 결", desc: "지루할 틈 없는 사이 — 서로를 깨우는 결" }
+];
 // 상호 십신 5가지 구도 (오행 거리 d 기준, {A}='당신' {B}='○○님' 고정 — 둘 다 받침으로 끝나 조사 확정형 사용)
 const MUTUAL_SIBSIN = [
   "두 사람은 서로에게 '자기 축'(비겁) — 거울을 보는 관계예요. 말이 통하는 만큼, 같은 자리를 두고 은근히 경쟁하게 되는 날도 있어요.",
@@ -888,6 +916,46 @@ const MUTUAL_SIBSIN = [
   "{B}은 {A}을 다잡아 주는 존재(규범·관성), {A}은 {B}이 아끼고 싶어지는 존재(현실 운용·재성)예요. {B}의 잔소리는 견제가 아니라 책임감이에요.",
   "{B}은 {A}을 채워 주는 존재(수용·인성), {A}은 {B}이 아낌없이 쏟는 존재(표현·식상)예요. 받기만 하는 것 같아 미안해질 때가 있지만, 그게 이 관계의 순방향이에요."
 ];
+
+/* ---------- 6.5 궁합 온천 기록 스토어 (5인 합의 스펙: 단일 배열, personKey 중복 제거, LRU 200) ---------- */
+const Matches = {
+  KEY: "wonpan_matches",
+  band(temp) { return temp >= 95 ? 0 : temp >= 85 ? 1 : 2; },
+  personKey(inp) { return [inp.y, inp.m, inp.d, inp.hourIdx, inp.mbti].join("|"); },
+  load() {
+    try { return JSON.parse(localStorage.getItem(this.KEY)) || []; } catch (e) { return []; }
+  },
+  save(list) {
+    try { localStorage.setItem(this.KEY, JSON.stringify(list)); }
+    catch (e) {
+      // 용량 초과 시 최고령 1건 퇴출 후 1회 재시도
+      if (list.length > 1) {
+        list.sort((a, b) => b.ts - a.ts).pop();
+        try { localStorage.setItem(this.KEY, JSON.stringify(list)); } catch (e2) { /* 포기 */ }
+      }
+    }
+  },
+  // 궁합을 계산·수신할 때 호출. other=상대 input, r=상대 분석 결과(캐시용), src="mine"|"loop"
+  add(other, cp, otherR, src) {
+    const list = this.load();
+    const key = this.personKey(other);
+    let rec = list.find(x => x.key === key);
+    if (rec) {
+      rec.ts = Date.now(); rec.nick = other.nick; rec.temp = cp.temp; rec.band = this.band(cp.temp);
+      rec.gyeol = cp.gyeol; rec.cnt = (rec.cnt || 1) + 1;
+      if (src === "loop") rec.src = "loop";
+    } else {
+      rec = { v: 1, key, code: App.encode(other), nick: other.nick, temp: cp.temp, band: this.band(cp.temp),
+        gyeol: cp.gyeol, ds: otherR.dayStem, ei: other.mbti[0], src, ts: Date.now(), cnt: 1 };
+      list.push(rec);
+      if (list.length > 200) { list.sort((a, b) => b.ts - a.ts); list.length = 200; }
+    }
+    this.save(list);
+    return rec;
+  },
+  remove(key) { this.save(this.load().filter(x => x.key !== key)); },
+  clear() { try { localStorage.removeItem(this.KEY); } catch (e) { /* 무시 */ } }
+};
 
 /* ---------- 7. 앱 컨트롤러 ---------- */
 // 생활 시간을 주표기로, 지지명은 괄호 부기. 진태양시 30분 보정 적용(5인 판정: 주류 만세력과 동일 기준)
@@ -946,10 +1014,36 @@ const App = {
     const hash = location.hash;
     if (hash.startsWith("#r=")) {
       try {
-        const data = JSON.parse(decodeURIComponent(escape(atob(hash.slice(3).replace(/-/g, "+").replace(/_/g, "/")))));
+        const data = this.decode(hash.slice(3));
         this.showResult(Engine.analyze(data), { friend: true });
         return;
       } catch (e) { /* 잘못된 코드는 무시 */ }
+    }
+    // 궁합 답장 링크 (#vs=코드A.코드B): 내가 당사자면 온천에 자동 기록, 아니면 관전 모드
+    if (hash.startsWith("#vs=")) {
+      const parts = hash.slice(4).split(".");
+      if (parts.length === 2) {
+        try {
+          const a = this.decode(parts[0]), b = this.decode(parts[1]);
+          let mine = null;
+          try { mine = JSON.parse(localStorage.getItem("wonpan_last")); } catch (e) { /* 무시 */ }
+          const myKey = mine ? Matches.personKey(mine) : null;
+          if (myKey && (myKey === Matches.personKey(a) || myKey === Matches.personKey(b))) {
+            const me = myKey === Matches.personKey(a) ? a : b;
+            const other = myKey === Matches.personKey(a) ? b : a;
+            this.state.vsCode = other;
+            this.state.loopSrc = true;
+            this.showResult(Engine.analyze(me));
+            this.toast("♨️ 답장 도착! 탕에 담갔어요 — 아래 온천 기록장에서 확인하세요");
+            return;
+          }
+          // 관전 모드: 두 사람 다 내가 아님 → 보여주기만 하고 기록 안 함
+          this.state.vsCode = b;
+          this.state.spectate = true;
+          this.showResult(Engine.analyze(a), { friend: true });
+          return;
+        } catch (e) { /* 잘못된 코드는 무시 */ }
+      }
     }
     try { if (localStorage.getItem("wonpan_last")) document.getElementById("btn-lastresult").style.display = "inline-flex"; } catch (e) { /* 스토리지 차단 환경 */ }
     // 어떤 오류도 조용히 죽지 않도록: 화면 토스트로 표시
@@ -967,7 +1061,7 @@ const App = {
   },
 
   go(screen) { document.body.dataset.screen = screen; window.scrollTo(0, 0); },
-  start() { this.state.vsCode = null; this.go("input"); this.showStep(1); },
+  start() { this.state.vsCode = null; this.state.spectate = false; this.state.loopSrc = false; this.go("input"); this.showStep(1); },
   showStep(n) {
     this.state.step = n;
     for (let i = 1; i <= 3; i++) {
@@ -1083,6 +1177,9 @@ const App = {
   encode(input) {
     return btoa(unescape(encodeURIComponent(JSON.stringify(input)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   },
+  decode(code) {
+    return JSON.parse(decodeURIComponent(escape(atob(code.replace(/-/g, "+").replace(/_/g, "/")))));
+  },
 
   /* ---------- 생활 리포트 카드 렌더 ---------- */
   renderLifeCard(r, item) {
@@ -1145,21 +1242,35 @@ const App = {
     const domSib = SIBSIN[r.top2[0]];
     const myCode = this.encode(r.input);
     const shareUrl = location.origin + location.pathname + "#r=" + myCode;
-    // 궁합 (URL로 초대받아 들어온 경우)
+    // 궁합 (내가 계산했거나, 답장 링크로 받은 경우)
     let compatHtml = "";
-    if (this.state.vsCode && !opts.friend) {
+    if (this.state.vsCode) {
       try {
         const other = Engine.analyze(this.state.vsCode);
         const cp = Engine.compat(r, other);
+        // 온천 기록: 관전 모드(내 궁합이 아님)가 아닐 때만 저장
+        if (!opts.friend && !this.state.spectate) {
+          Matches.add(other.input, cp, other, this.state.loopSrc ? "loop" : "mine");
+          this.state.loopSrc = false;
+        }
+        // 답장 루프 준비
+        this._reply = {
+          url: location.origin + location.pathname + "#vs=" + this.encode(r.input) + "." + this.encode(other.input),
+          text: `우리 궁합 ${cp.temp}°래 ♨️ ${GYEOL[cp.gyeol].e} '${GYEOL[cp.gyeol].name}'이래 ㅋㅋ 네 탕에도 담가놔!`,
+          nick: other.input.nick
+        };
         compatHtml = `<div class="card compat-card">
           <h3>💞 ${other.input.nick}님과의 원판 궁합</h3>
           <div class="cp-chars">${CharSVG.mini(r.dayStem, ei, 82)}<span class="cp-heart">💘</span>${CharSVG.mini(other.dayStem, other.input.mbti[0], 82, true)}</div>
           <div class="cp-temp" style="color:${elem.dark}">궁합 온도 ${cp.temp}°</div>
+          ${cp.temp >= 95 ? `<div class="cp-badge">♨️ 펄펄 커플</div>` : ""}
+          <p class="cp-gyeol">${GYEOL[cp.gyeol].e} <b>${GYEOL[cp.gyeol].name}</b> — ${GYEOL[cp.gyeol].desc}</p>
           ${cp.lines.map(l => `<p>${l}</p>`).join("")}
           <div class="cp-label">🌱 타고난 합 — 서로가 서로에게 어떤 존재인지</div>
           <p>${cp.born}</p>
           <div class="cp-label">🎭 살아남은 합 — 지금의 두 사람</div>
           ${cp.now.map(l => `<p>${l}</p>`).join("")}
+          <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="App.shareReply()">♨️ 이 온도, ${other.input.nick}님 탕에 담가주기</button>
           <p class="cp-flip">↔ 링크를 서로 바꿔 열면 '타고난 합'의 방향이 뒤집혀 보여요</p>
         </div>`;
       } catch (e) { /* 무시 */ }
@@ -1260,6 +1371,8 @@ const App = {
 
       ${compatHtml}
 
+      ${opts.friend ? "" : this.renderOnsenCard()}
+
       ${friendCta || `<div class="share-grid">
         <button class="btn btn-primary" onclick="App.saveCard('feed')">📷 피드용 저장 (4:5)</button>
         <button class="btn btn-primary" onclick="App.saveCard('story')">📱 스토리용 저장 (9:16)</button>
@@ -1280,10 +1393,90 @@ const App = {
   },
 
   startVs(friendCode) {
-    try { this.state.vsCode = JSON.parse(decodeURIComponent(escape(atob(friendCode.replace(/-/g, "+").replace(/_/g, "/"))))); } catch (e) { this.state.vsCode = null; }
+    try { this.state.vsCode = this.decode(friendCode); } catch (e) { this.state.vsCode = null; }
+    this.state.spectate = false;
+    this.state.loopSrc = false;
     history.replaceState(null, "", location.pathname);
     this.go("input");
     this.showStep(1);
+  },
+
+  // 답장 루프: 궁합 결과를 상대 탕에 담가주기 (#vs=코드A.코드B)
+  shareReply() {
+    if (!this._reply) return;
+    const { url, text, nick } = this._reply;
+    if (navigator.share) {
+      navigator.share({ title: "원판 찾기 — 궁합 답장", text, url }).catch(err => {
+        if (err && err.name !== "AbortError") this.copyText(text + "\n" + url);
+      });
+    } else {
+      this.copyText(text + "\n" + url);
+    }
+  },
+  toggleOnsenAnon() {
+    this.state.onsenAnon = !this.state.onsenAnon;
+    if (this._r) this.showResult(this._r);
+  },
+  openMatch(key) {
+    const rec = Matches.load().find(x => x.key === key);
+    let mine = null;
+    try { mine = JSON.parse(localStorage.getItem("wonpan_last")); } catch (e) { /* 무시 */ }
+    if (!rec || !mine) { this.toast("내 결과를 먼저 만들어야 궁합을 볼 수 있어요!"); return; }
+    try {
+      this.state.vsCode = this.decode(rec.code);
+      this.showResult(Engine.analyze(mine));
+      window.scrollTo(0, 0);
+    } catch (e) { this.toast("기록을 여는 데 실패했어요 😢"); }
+  },
+  removeMatch(key) {
+    Matches.remove(key);
+    this.toast("탕에서 내보냈어요 🫧");
+    if (this._r) this.showResult(this._r);
+  },
+  clearMatches() {
+    if (!confirm("온천 기록을 전부 비울까요? 되돌릴 수 없어요!")) return;
+    Matches.clear();
+    this.toast("온천을 비웠어요 🧹");
+    if (this._r) this.showResult(this._r);
+  },
+  // 온천탕 보드: 3개 탕(동점·서열 문제를 그룹으로 해소), 순위 숫자 미표기 (5인 합의)
+  renderOnsenCard() {
+    const list = Matches.load();
+    const anon = this.state.onsenAnon;
+    const anonNames = {};
+    if (anon) [...list].sort((a, b) => a.ts - b.ts).forEach((x, i) => anonNames[x.key] = "친구 " + (i + 1));
+    let inner;
+    if (!list.length) {
+      inner = `<p class="onsen-empty">아직 나 혼자 반신욕 중… 🫧<br>친구 링크로 궁합을 보거나, 내 링크를 보낸 친구에게<br>"결과 알려줘!"라고 재촉해보세요 👉</p>`;
+    } else {
+      const BATHS = [
+        { name: "♨️ 펄펄탕", sub: "95° 이상", bg: "#FFE9F1", edge: "#FF9EBB", dark: "#D6537E" },
+        { name: "🌤 따끈탕", sub: "85~94°", bg: "#FFF4DC", edge: "#FFCE7E", dark: "#A87F3E" },
+        { name: "🧣 아랫목탕", sub: "75~84° · 늦게 데워져도 안 식는 진국 자리", bg: "#EAF6EE", edge: "#A8D8B9", dark: "#3E8E6E" }
+      ];
+      const sorted = [...list].sort((a, b) => b.ts - a.ts);
+      inner = BATHS.map((bd, bi) => {
+        const rows = sorted.filter(x => x.band === bi);
+        if (!rows.length) return "";
+        return `<div class="tang" style="background:${bd.bg};border-color:${bd.edge}">
+          <div class="tang-head" style="color:${bd.dark}">${bd.name} <span>${bd.sub}</span></div>
+          <div class="tang-chips">${rows.map(x => `
+            <span class="onsen-chip" onclick="App.openMatch('${x.key}')">
+              ${CharSVG.mini(x.ds, x.ei, 38)}
+              <b>${anon ? anonNames[x.key] : x.nick}</b>
+              <em>${GYEOL[x.gyeol].e} ${x.temp}°</em>
+              ${x.cnt >= 2 ? `<u>×${x.cnt}</u>` : ""}${x.src === "loop" ? " 💌" : ""}
+              <i onclick="event.stopPropagation();App.removeMatch('${x.key}')">✕</i>
+            </span>`).join("")}</div>
+        </div>`;
+      }).join("");
+    }
+    return `<div class="card onsen-card">
+      <h3>♨️ 나의 궁합 온천 ${list.length ? `<button class="onsen-anon" onclick="App.toggleOnsenAnon()">👁 ${anon ? "닉네임 보이기" : "닉네임 가리기"}</button>` : ""}</h3>
+      <p class="onsen-note">온도는 점수가 아니라 관계의 결이에요. 75°는 은은하게 오래 데워지는 사이 🌱</p>
+      ${inner}
+      <p class="onsen-foot">💾 친구 정보는 이 브라우저에만 저장되고 서버로 전송되지 않아요 · 온도는 그날의 재미, 진짜 궁합은 시간이 만들어요 ⏳${list.length ? ` · <a href="javascript:void(0)" onclick="App.clearMatches()">전체 비우기</a>` : ""}</p>
+    </div>`;
   },
 
   share() {
@@ -1520,6 +1713,14 @@ App.init();
     }
   }
   for (let i = 0; i < 10; i++) t.push(["일간 수식절 " + STEM_NAMES[i], !!(STEM_LIFE[i].m && STEM_LIFE[i].l), true, true]);
+  // 궁합 온천: 탕 배정·결 매핑·동일인 키 검증
+  eq("탕 배정 75°→아랫목", Matches.band(75), 2);
+  eq("탕 배정 89°→따끈", Matches.band(89), 1);
+  eq("탕 배정 99°→펄펄", Matches.band(99), 0);
+  const cpT = Engine.compat(Engine.analyze({ y: 1996, m: 2, d: 4, hourIdx: 5, mbti: "INFP", nick: "a", est: 0, lun: 0 }),
+    Engine.analyze({ y: 1995, m: 7, d: 20, hourIdx: -1, mbti: "ENTJ", nick: "b", est: 0, lun: 0 }));
+  eq("결 매핑 (금→수 상생 d=1 → 지피는 결)", cpT.gyeol, 1);
+  eq("동일인 키 닉네임 무관", Matches.personKey({ y: 1, m: 2, d: 3, hourIdx: 4, mbti: "INFP", nick: "가" }), Matches.personKey({ y: 1, m: 2, d: 3, hourIdx: 4, mbti: "INFP", nick: "나" }));
   // 재발 방지(용어 자문 합의): 공용 문구 풀에 전문 원어 단독 노출 금지 — 발견 시 테스트 실패
   const JARGON = /열등기능|주기능|부기능|3차기능|인지기능|십신|비겁|식상|재성|관성|인성(?!\))|\b(Ni|Ne|Si|Se|Ti|Te|Fi|Fe)\b/;
   TODAY_POOL.forEach((msg, i) => t.push(["공용 문구 금칙어 #" + i, !JARGON.test(msg), msg.slice(0, 20), "clean"]));
